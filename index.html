@@ -45,7 +45,7 @@ This version isnt good on mobile:
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      var pdfURL = "path/to/your/pdf.pdf";
+      var pdfURL = "design portfolio.pdf";
       pdfjsLib.getDocument(pdfURL).promise.then(function (pdfDoc) {
         var numPages = pdfDoc.numPages;
         pdfDoc.getPage(1).then(function (page) {
