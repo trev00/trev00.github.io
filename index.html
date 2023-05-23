@@ -1,3 +1,6 @@
+<!--
+This version isnt good on mobile:
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,5 +21,51 @@
 </head>
 <body>
   <iframe src="design portfolio.pdf"></iframe>
+</body>
+</html>
+-->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PDF Viewer</title>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+    #pdf-viewer {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var pdfURL = "path/to/your/pdf.pdf";
+      pdfjsLib.getDocument(pdfURL).promise.then(function (pdfDoc) {
+        var numPages = pdfDoc.numPages;
+        pdfDoc.getPage(1).then(function (page) {
+          var scale = 1.5;
+          var viewport = page.getViewport({ scale: scale });
+          var canvas = document.createElement("canvas");
+          var context = canvas.getContext("2d");
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          document.getElementById("pdf-viewer").appendChild(canvas);
+          page.render({
+            canvasContext: context,
+            viewport: viewport
+          });
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <div id="pdf-viewer"></div>
 </body>
 </html>
