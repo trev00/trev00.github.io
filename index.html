@@ -35,7 +35,7 @@
   </div>
 </body>
 </html>
--->
+
 
 <!DOCTYPE html>
 <html>
@@ -62,7 +62,51 @@
 </body>
 </html>
 
+-->
 
+<style>
+  #pdf-viewer {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.1);
+    overflow: auto;
+  }
+  
+  .pdf-page-canvas {
+    display: block;
+    margin: 0;
+    border: none;
+  }
+</style>
+
+<script>   
+    url = 'Trevor Tuck - Design Portfolio.pdf';
+    var thePdf = null;
+    var scale = 1;
+    
+    PDFJS.getDocument(url).promise.then(function(pdf) {
+        thePdf = pdf;
+        viewer = document.getElementById('pdf-viewer');
+        
+        for(page = 1; page <= pdf.numPages; page++) {
+          canvas = document.createElement("canvas");    
+          canvas.className = 'pdf-page-canvas';         
+          viewer.appendChild(canvas);            
+          renderPage(page, canvas);
+        }
+    });
+    
+    function renderPage(pageNumber, canvas) {
+        thePdf.getPage(pageNumber).then(function(page) {
+          viewport = page.getViewport({ scale: scale });
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;          
+          page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});
+    });
+    }
+</script>
+
+<div id='pdf-viewer'></div>
 
 
 
