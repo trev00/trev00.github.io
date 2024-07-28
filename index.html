@@ -1,3 +1,5 @@
+
+<!-- this is my original code. the pdf is not correctly displayed on mobile.
 <!DOCTYPE html>
 <html lang="en" style="width:100%; height:100%;">
 <head>
@@ -5,18 +7,20 @@
   <title>Trevor Tuck - Design Portfolio</title>
 </head>
   <body style="width:100%; height:100%; margin:0;">
-<!--   <object data="Trevor Tuck - Design Portfolio.pdf" style="width:100%; height:100%;"></object> -->
+   <object data="Trevor Tuck - Design Portfolio.pdf" style="width:100%; height:100%;"></object> 
     <iframe src="Trevor Tuck - Design Portfolio.pdf" style="width:100%; height:100%;" frameborder="0"></iframe>
   </body>
 </html>
+-->
 
-<!--
 
+<!-- this is written by chat gpt. lets see if it works. -->
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PDF Viewer</title>
   <style>
     body, html {
@@ -32,96 +36,6 @@
   </style>
 </head>
 <body>
-  <iframe src="Trevor Tuck - Design Portfolio.pdf"></iframe>
+  <iframe src="Trevor Tuck - Design Portfolio.pdf" type="application/pdf"></iframe>
 </body>
 </html>
-
-
-
-<!DOCTYPE html>
-<html>
-<head>
-  <title>PDF Viewer</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
-</head>
-<body>
-  <div id="pdf-container">
-    <iframe src="Trevor Tuck - Design Portfolio.pdf" width="100%" height="100%" frameborder="0"></iframe>
-  </div>
-</body>
-</html>
-
-
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>PDF Viewer</title>
-  <style>
-    body, html {
-      height: 100%;
-      margin: 0;
-      overflow: hidden;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
-</head>
-<body>
-  <object data="Trevor Tuck - Design Portfolio.pdf" type="application/pdf">
-    <embed src="Trevor Tuck - Design Portfolio.pdf" /> 
-</object>
-</body>
-</html>
-
-
-
-<style>
-  #pdf-viewer {
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.1);
-    overflow: auto;
-  }
-  
-  .pdf-page-canvas {
-    display: block;
-    margin: 0;
-    border: none;
-  }
-</style>
-
-<script>   
-    url = 'Trevor Tuck - Design Portfolio.pdf';
-    var thePdf = null;
-    var scale = 1;
-    
-    PDFJS.getDocument(url).promise.then(function(pdf) {
-        thePdf = pdf;
-        viewer = document.getElementById('pdf-viewer');
-        
-        for(page = 1; page <= pdf.numPages; page++) {
-          canvas = document.createElement("canvas");    
-          canvas.className = 'pdf-page-canvas';         
-          viewer.appendChild(canvas);            
-          renderPage(page, canvas);
-        }
-    });
-    
-    function renderPage(pageNumber, canvas) {
-        thePdf.getPage(pageNumber).then(function(page) {
-          viewport = page.getViewport({ scale: scale });
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;          
-          page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});
-    });
-    }
-</script>
-
-<div id='pdf-viewer'></div>
-
-
-
