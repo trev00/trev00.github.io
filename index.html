@@ -23,19 +23,23 @@
       width: 100%;
     }
   </style>
+    <script>
+    function isMobileDevice() {
+      return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+    }
+
+    window.onload = function() {
+      if (isMobileDevice()) {
+        window.location.href = "https://drive.google.com/file/d/17Uvar6yz1GneM89vofWlLxlIErudQv4y/view?usp=sharing";
+      }
+    }
+  </script>
 <head>
 <body>
   <div class="pdf-container">
     <object data="https://drive.google.com/file/d/17Uvar6yz1GneM89vofWlLxlIErudQv4y/preview?usp=sharing" type="application/pdf">
-      <p> view .pdf in google drive link <a href="https://drive.google.com/file/d/17Uvar6yz1GneM89vofWlLxlIErudQv4y/view?usp=sharing">download the PDF</a>.</p>
+      <p> view .pdf in google drive link <a href="https://drive.google.com/file/d/17Uvar6yz1GneM89vofWlLxlIErudQv4y/preview?usp=sharing">download the PDF</a>.</p>
     </object>
   </div>
 </body>
-<!--
-</body>  
-  <object data="Trevor Tuck - Design Portfolio.pdf" type="application/pdf" width="auto" height="1200px">
-      <embed src="https://drive.google.com/file/d/17Uvar6yz1GneM89vofWlLxlIErudQv4y/preview?usp=sharing"/>
-    </object>
-</body>
-  -->
 </html>
