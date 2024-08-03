@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,3 +43,42 @@
     <iframe src="Trevor Tuck - Design Portfolio.pdf" style="width:100%; height:100%;" frameborder="0" overflow:hidden></iframe>
 </body>
 </html>
+-->
+
+
+<!-- take 2 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trevor Tuck</title>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      overflow:hidden;
+    }
+  </style>
+    <script>
+    function isMobileDevice() {
+      return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+    }
+
+    window.onload = function() {
+      if (isMobileDevice()) {
+        window.location.href = "https://drive.google.com/file/d/17Uvar6yz1GneM89vofWlLxlIErudQv4y/view?usp=sharing";
+      }
+    }
+  </script>
+</head>
+<body>
+  <iframe src="Trevor Tuck - Design Portfolio.pdf" type="application/pdf"></iframe>
+</body>
+</html> 
