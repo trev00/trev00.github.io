@@ -25,10 +25,10 @@ const loader = new GLTFLoader();
 
 //Load the file
 loader.load(
-  `./models/${objToRender}/scene.gltf`,
+  `./models/${objToRender}/headtubelug.gltf`,
   function (gltf) {
     //If the file is loaded, add it to the scene
-    object = gltf.scene;
+    object = gltf.headtubelug;
     scene.add(object);
   },
   function (xhr) {
@@ -42,7 +42,7 @@ loader.load(
 );
 
 //Instantiate a new renderer and set its size
-const renderer = new THREE.WebGLRenderer({ alpha: false }); //Alpha: true allows for the transparent background
+const renderer = new THREE.WebGLRenderer({ alpha: true }); //Alpha: true allows for the transparent background
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 //Add the renderer to the DOM
