@@ -185,7 +185,7 @@ spotLight.castShadow = true;
 spotLight.shadow.bias = -0.0001;
 scene.add(spotLight);
 
-const loader = new GLTFLoader().setPath('3dmodels/headtubelug');
+const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (gltf) => {
   console.log('loading model');
   const mesh = gltf.scene;
