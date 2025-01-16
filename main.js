@@ -28,7 +28,7 @@ const loader = new GLTFLoader();
 
 //Load the file
 loader.load(
-  `./models/${objToRender}/headtubelug.gltf`,
+  `./3d model/headtubelug.gltf`,
   function (gltf) {
     //If the file is loaded, add it to the scene
     object = gltf.headtubelug;
@@ -58,10 +58,10 @@ camera.position.z = objToRender === "headtubelug" ? 25 : 500;
 const topLight = new THREE.DirectionalLight(0xffffff, 1); // (color, intensity)
 topLight.position.set(500, 500, 500) //top-left-ish
 topLight.castShadow = true;
-scene.add(topLight);
+headtubelug.add(topLight);
 
 const ambientLight = new THREE.AmbientLight(0x333333, objToRender === "headtubelug" ? 5 : 1);
-scene.add(ambientLight);
+headtubelug.add(ambientLight);
 
 //This adds controls to the camera, so we can rotate / zoom it with the mouse
 if (objToRender === "headtubelug") {
