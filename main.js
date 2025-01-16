@@ -1,18 +1,9 @@
 //Import the THREE.js library
-import * as THREE from 'three';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { GLBLoader } from 'three/addons/loaders/GLBLoader.js';
-
-const controls = new OrbitControls( camera, renderer.domElement );
-const loader = new GLTFLoader();
-
-//import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
+import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
 // To allow for the camera to move around the scene
-//import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
+import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
 // To allow for importing the .gltf file
-//import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
+import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
 
 //Create a Three.JS Scene
 const scene = new THREE.Scene();
@@ -38,9 +29,9 @@ const loader = new GLTFLoader();
 //Load the file
 loader.load(
   `./3dmodels/${objToRender}/scene.glb`,
-  function (gltf) {
+  function (glb) {
     //If the file is loaded, add it to the scene
-    object = gltf.scene;
+    object = glb.scene;
     scene.add(object);
   },
   function (xhr) {
@@ -82,8 +73,9 @@ function animate() {
   requestAnimationFrame(animate);
   //Here we could add some code to update the scene, adding some automatic movement
 
+  
   //Make the eye move
-  if (object && objToRender === "headtubelug") {
+  if (object && objToRender === "eye") {
     //I've played with the constants here until it looked good 
     object.rotation.y = -3 + mouseX / window.innerWidth * 3;
     object.rotation.x = -1.2 + mouseY * 2.5 / window.innerHeight;
