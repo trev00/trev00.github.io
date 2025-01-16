@@ -52,7 +52,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById("container3D").appendChild(renderer.domElement);
 
 //Set how far the camera will be from the 3D model
-camera.position.z = objToRender === "headtubelug" ? 10 : 500;
+camera.position.z = objToRender === "headtubelug" ? 25 : 500;
 
 //Add lights to the scene, to see 3D model
 const topLight = new THREE.DirectionalLight(0xffffff, 1); // (color, intensity)
