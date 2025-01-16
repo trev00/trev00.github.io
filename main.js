@@ -10,11 +10,11 @@ const scene = new THREE.Scene();
 //create a new camera with positions and angles
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-//Keep track of the mouse position, so we can make the eye move
+//Keep track of the mouse position
 let mouseX = window.innerWidth / 2;
 let mouseY = window.innerHeight / 2;
 
-//Keep the 3D object on a global variable so we can access it later
+//Keep the 3D object on a global variable
 let object;
 
 //OrbitControls allow the camera to move around the scene
@@ -23,7 +23,7 @@ let controls;
 //Set which object to render
 let objToRender = 'headtubelug';
 
-//Instantiate a loader for the .gltf file
+//Instantiate a loader for the .glb file
 const loader = new GLTFLoader();
 
 //Load the file
@@ -54,7 +54,7 @@ document.getElementById("container3D").appendChild(renderer.domElement);
 //Set how far the camera will be from the 3D model
 camera.position.z = objToRender === "headtubelug" ? 25 : 500;
 
-//Add lights to the scene, so we can actually see the 3D model
+//Add lights to the scene, to see 3D model
 const topLight = new THREE.DirectionalLight(0xffffff, 1); // (color, intensity)
 topLight.position.set(500, 500, 500) //top-left-ish
 topLight.castShadow = true;
@@ -63,7 +63,7 @@ scene.add(topLight);
 const ambientLight = new THREE.AmbientLight(0x333333, objToRender === "headtubelug" ? 5 : 1);
 scene.add(ambientLight);
 
-//This adds controls to the camera, so we can rotate / zoom it with the mouse
+//This adds controls to the camera, to rotate / zoom it with the mouse
 if (objToRender === "headtubelug") {
   controls = new OrbitControls(camera, renderer.domElement);
 }
@@ -71,26 +71,16 @@ if (objToRender === "headtubelug") {
 //Render the scene
 function animate() {
   requestAnimationFrame(animate);
-  //Here we could add some code to update the scene, adding some automatic movement
+  //Potential for automatic movement
 
-  
-  //Make the eye move
-  if (object && objToRender === "eye") {
-    //I've played with the constants here until it looked good 
-    object.rotation.y = -3 + mouseX / window.innerWidth * 3;
-    object.rotation.x = -1.2 + mouseY * 2.5 / window.innerHeight;
-  }
-  renderer.render(scene, camera);
-}
-
-//Add a listener to the window, so we can resize the window and the camera
+//Add a listener to the window, to resize the window and the camera
 window.addEventListener("resize", function () {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-//add mouse position listener, so we can make the eye move
+//add mouse position listener
 document.onmousemove = (e) => {
   mouseX = e.clientX;
   mouseY = e.clientY;
