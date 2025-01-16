@@ -31,8 +31,8 @@ loader.load(
   `./models/${objToRender}/headtubelug.gltf`,
   function (gltf) {
     //If the file is loaded, add it to the scene
-    object = gltf.scene;
-    scene.add(object);
+    object = gltf.headtubelug;
+    headtubelug.add(object);
   },
   function (xhr) {
     //While it is loading, log the progress
