@@ -26,6 +26,48 @@ let objToRender = 'headtubelug';
 //Instantiate a loader for the .glb file
 const loader = new GLTFLoader();
 
+
+//GPT Version
+loader.load(
+  `./3dmodels/${objToRender}/scene.glb`,
+  function (glb) {
+    object = glb.scene;
+    
+    // Compute bounding box and center the object
+    const box = new THREE.Box3().setFromObject(object);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    
+    object.position.x -= center.x;
+    object.position.y -= center.y;
+    object.position.z -= center.z;
+
+    // Adjust camera position based on object size
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fitHeightDistance = maxDim / (2 * Math.atan((Math.PI * camera.fov) / 360));
+    const fitWidthDistance = fitHeightDistance / camera.aspect;
+    const distance = Math.max(fitHeightDistance, fitWidthDistance);
+
+    camera.position.z = distance;
+    camera.lookAt(center);
+
+    scene.add(object);
+  },
+  function (xhr) {
+    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+  },
+  function (error) {
+    console.error(error);
+  }
+);
+
+//End GPT version
+
+
+
+
+
+/* My version
 //Load the file
 loader.load(
   `./3dmodels/${objToRender}/scene.glb`,
@@ -43,6 +85,7 @@ loader.load(
     console.error(error);
   }
 );
+*/
 
 //Instantiate a new renderer and set its size
 const renderer = new THREE.WebGLRenderer({ alpha: true }); //Alpha: true allows for the transparent background
