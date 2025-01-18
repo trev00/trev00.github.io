@@ -57,9 +57,6 @@ spotLight.shadow.camera.fov = 30;
 
 scene.add( spotLight );
 
-const light = new THREE.AmbientLight( 0x404040 );
-scene.add( light );
-
 const axesHelper = new THREE.AxesHelper( 5 );
 scene.add( axesHelper );
 
