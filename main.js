@@ -191,7 +191,7 @@ scene.add( light );
 
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
-  console.log('loading model');
+  console.log('jumping to lightspeed');
   const mesh = glb.scene;
 
   mesh.traverse((child) => {
