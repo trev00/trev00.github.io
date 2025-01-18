@@ -136,9 +136,9 @@ document.onmousemove = (e) => {
 animate();
 */
 
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
+import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -195,6 +195,15 @@ scene.add( axesHelper );
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
   console.log('jumping to lightspeed');
+  
+  const box = new THREE.Box3().setFromObject(object);
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+    
+  object.position.x -= center.x;
+  object.position.y -= center.y;
+  object.position.z -= center.z;
+  
   const mesh = glb.scene;
 
   mesh.traverse((child) => {
