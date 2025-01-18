@@ -194,7 +194,7 @@ scene.add( axesHelper );
 
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
-  console.log('jumping to lightspeed');
+  console.log('loading model');
   
   const box = new THREE.Box3().setFromObject(object);
   const center = box.getCenter(new THREE.Vector3());
@@ -218,7 +218,7 @@ loader.load('scene.glb', (glb) => {
 
   document.getElementById('progress-container').style.display = 'none';
 }, (xhr) => {
-  console.log(`loading ${xhr.loaded / xhr.total * 100}%`);
+  console.log(`jumping to hyperspace ${xhr.loaded / xhr.total * 100}%`);
 }, (error) => {
   console.error(error);
 });
