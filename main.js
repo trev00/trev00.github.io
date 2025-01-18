@@ -196,14 +196,6 @@ const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
   console.log('loading model');
   
-  const box = new THREE.Box3().setFromObject(object);
-  const center = box.getCenter(new THREE.Vector3());
-  const size = box.getSize(new THREE.Vector3());
-    
-  object.position.x -= center.x;
-  object.position.y -= center.y;
-  object.position.z -= center.z;
-  
   const mesh = glb.scene;
 
   mesh.traverse((child) => {
@@ -215,7 +207,15 @@ loader.load('scene.glb', (glb) => {
 
   mesh.position.set(0, 1.05, -1);
   scene.add(mesh);
-
+  
+  const box = new THREE.Box3().setFromObject(object);
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+    
+  object.position.x -= center.x;
+  object.position.y -= center.y;
+  object.position.z -= center.z;
+  
   document.getElementById('progress-container').style.display = 'none';
 }, (xhr) => {
   console.log(`jumping to hyperspace ${xhr.loaded / xhr.total * 100}%`);
