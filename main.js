@@ -189,6 +189,9 @@ scene.add(spotLight);
 const light = new THREE.AmbientLight( 0x404040 );
 scene.add( light );
 
+const axesHelper = new THREE.AxesHelper( 5 );
+scene.add( axesHelper );
+
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
   console.log('jumping to lightspeed');
