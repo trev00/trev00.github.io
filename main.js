@@ -154,14 +154,14 @@ document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .1, 10);
 camera.position.set(0,1,1);
 camera.lookAt(new THREE.Vector3(0,0,0));
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.enablePan = false;
-controls.minDistance = 0;
+controls.minDistance = .1;
 controls.maxDistance = 5;
 controls.minPolarAngle = 0.5;
 controls.maxPolarAngle = 1.5;
