@@ -73,7 +73,7 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(0, 1.05, -1);
+  mesh.position.set(0, .5, 0);
   scene.add(mesh);
   
   document.getElementById('progress-container').style.display = 'none';
