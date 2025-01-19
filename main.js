@@ -4,20 +4,17 @@ import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/l
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
-
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x000000);
 renderer.setPixelRatio(window.devicePixelRatio);
-
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .1, 100);
-camera.position.set(0,.5,.5);
+camera.position.set(0,4,4);
 camera.lookAt(0,0,0);
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -33,6 +30,7 @@ controls.update();
 
 const groundGeometry = new THREE.PlaneGeometry(5, 5, 8, 8);
 groundGeometry.rotateX(-Math.PI / 2);
+
 const groundMaterial = new THREE.MeshStandardMaterial({
   color: 0x555555,
   side: THREE.DoubleSide
@@ -43,18 +41,8 @@ groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
 const spotLight = new THREE.SpotLight( 0xffffff );
-spotLight.position.set( 1, 1000, 100, .22 );
-spotLight.map = new THREE.TextureLoader().load( url );
-
+spotLight.position.set(1, 2, 1);
 spotLight.castShadow = true;
-
-spotLight.shadow.mapSize.width = 1024;
-spotLight.shadow.mapSize.height = 1024;
-
-spotLight.shadow.camera.near = 500;
-spotLight.shadow.camera.far = 4000;
-spotLight.shadow.camera.fov = 30;
-
 scene.add( spotLight );
 
 const axesHelper = new THREE.AxesHelper( 5 );
@@ -73,7 +61,8 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(0, .5, 0);
+  mesh.position.set(0, 0, 0);
+  mesh.scale.set(2, 2, 2);
   scene.add(mesh);
   
   document.getElementById('progress-container').style.display = 'none';
