@@ -39,12 +39,12 @@ groundMesh.castShadow = false;
 groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
-const topLight = new THREE.DirectionalLight(0x404040, 1);
+const topLight = new THREE.DirectionalLight(0x404040, .8);
 topLight.position.set(500, 500, 500)
 topLight.castShadow = true;
 scene.add(topLight);
 
-const ambientLight = new THREE.AmbientLight(0x404040, 1);
+const ambientLight = new THREE.AmbientLight(0x404040, 2);
 scene.add(ambientLight);
 
 const axesHelper = new THREE.AxesHelper(2); // Size of 2 units
