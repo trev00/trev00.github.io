@@ -28,12 +28,12 @@ controls.autoRotate = false;
 controls.target = new THREE.Vector3(0, 4, 0);
 controls.update();
 
-const topLight = new THREE.DirectionalLight(0xffffff, 1);
+const topLight = new THREE.DirectionalLight(0x404040, 1);
 topLight.position.set(500, 500, 500)
 topLight.castShadow = true;
 scene.add(topLight);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+const ambientLight = new THREE.AmbientLight(0x404040, 1);
 scene.add(ambientLight);
 
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
