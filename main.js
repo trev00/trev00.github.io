@@ -25,7 +25,7 @@ controls.maxDistance = 4;
 controls.minPolarAngle = 0.5;
 controls.maxPolarAngle = 1.5;
 controls.autoRotate = false;
-controls.target = new THREE.Vector3(0, 4, 0);
+controls.target = new THREE.Vector3(0, 2, 0);
 controls.update();
 
 const groundGeometry = new THREE.PlaneGeometry(8, 8, 12, 12);
