@@ -33,7 +33,7 @@ body {
 .border {
   background: linear-gradient(90deg, gray, 90%, black);
   height: 2px;
-  width: 20vw;
+  width: 16vw;
   margin-top: 3px;
 }
 
