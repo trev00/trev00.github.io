@@ -64,7 +64,7 @@ loader.load('scene.glb', (glb) => {
   });
 
   mesh.position.set(-2, 2, 0);
-  mesh.scale.set(7, 7, 7);
+  mesh.scale.set(4, 4, 4);
   scene.add(mesh);
   
   document.getElementById('progress-container').style.display = 'none';
