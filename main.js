@@ -14,8 +14,8 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .1, 100);
-camera.position.set(0,8,8);
-camera.lookAt(0,4,0);
+camera.position.set(0,5,5);
+camera.lookAt(0,0,0);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -27,6 +27,17 @@ controls.maxPolarAngle = 1.5;
 controls.autoRotate = false;
 controls.target = new THREE.Vector3(0, 4, 0);
 controls.update();
+
+const groundGeometry = new THREE.PlaneGeometry(8, 8, 12, 12);
+groundGeometry.rotateX(-Math.PI / 2);
+const groundMaterial = new THREE.MeshStandardMaterial({
+  color: 0x555555,
+  side: THREE.DoubleSide
+});
+const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
+groundMesh.castShadow = false;
+groundMesh.receiveShadow = true;
+scene.add(groundMesh);
 
 const topLight = new THREE.DirectionalLight(0x404040, 1);
 topLight.position.set(500, 500, 500)
