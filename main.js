@@ -14,8 +14,8 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .1, 100);
-camera.position.set(0,4,4);
-camera.lookAt(0,0,0);
+camera.position.set(0,8,8);
+camera.lookAt(0,4,0);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -25,31 +25,16 @@ controls.maxDistance = 5;
 controls.minPolarAngle = 0.5;
 controls.maxPolarAngle = 1.5;
 controls.autoRotate = false;
-controls.target = new THREE.Vector3(0, 1, 0);
+controls.target = new THREE.Vector3(0, 4, 0);
 controls.update();
-
-const groundGeometry = new THREE.PlaneGeometry(8, 8, 12, 12);
-groundGeometry.rotateX(-Math.PI / 2);
-
-const groundMaterial = new THREE.MeshStandardMaterial({
-  color: 0x555555,
-  side: THREE.DoubleSide
-});
-const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
-groundMesh.castShadow = false;
-groundMesh.receiveShadow = true;
-scene.add(groundMesh);
 
 const topLight = new THREE.DirectionalLight(0xffffff, 1);
 topLight.position.set(500, 500, 500)
 topLight.castShadow = true;
 scene.add(topLight);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, .5);
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
-
-const axesHelper = new THREE.AxesHelper( 1 );
-scene.add( axesHelper );
 
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
@@ -64,8 +49,8 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(-2, 2, 0);
-  mesh.scale.set(4, 4, 4);
+  mesh.position.set(-2, 4, 0);
+  mesh.scale.set(7, 7, 7);
   scene.add(mesh);
   
   document.getElementById('progress-container').style.display = 'none';
