@@ -15,7 +15,7 @@ const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .1, 100);
 camera.position.set(0,5,5);
-camera.lookAt(0,0,0);
+camera.lookAt(0,2,0);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -47,6 +47,9 @@ scene.add(topLight);
 const ambientLight = new THREE.AmbientLight(0x404040, 1);
 scene.add(ambientLight);
 
+const axesHelper = new THREE.AxesHelper(2); // Size of 2 units
+scene.add(axesHelper);
+
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
   console.log('loading model');
@@ -60,7 +63,7 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(-2, 4, 0);
+  mesh.position.set(-2, 2, 0);
   mesh.scale.set(7, 7, 7);
   scene.add(mesh);
   
