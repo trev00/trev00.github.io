@@ -39,12 +39,12 @@ groundMesh.castShadow = false;
 groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
-const topLight = new THREE.DirectionalLight(0x404040, .8);
+const topLight = new THREE.DirectionalLight(0x404040, 1);
 topLight.position.set(500, 500, 500)
 topLight.castShadow = true;
 scene.add(topLight);
 
-const ambientLight = new THREE.AmbientLight(0x404040, 2);
+const ambientLight = new THREE.AmbientLight(0x404040, 2.5);
 scene.add(ambientLight);
 
 /*
