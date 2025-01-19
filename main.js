@@ -47,8 +47,10 @@ scene.add(topLight);
 const ambientLight = new THREE.AmbientLight(0x404040, 2);
 scene.add(ambientLight);
 
+/*
 const axesHelper = new THREE.AxesHelper(2); // Size of 2 units
 scene.add(axesHelper);
+*/
 
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
