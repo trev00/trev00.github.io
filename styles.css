@@ -56,14 +56,14 @@ body {
   width: 100%;
   padding: 32px;
 }
-
+/*
 .border {
   background: linear-gradient(90deg, gray, 90%, black);
   height: 2px;
   width: 80vw;
   margin-top: 4px;
 }
-
+*/
 h1 {
   color: rgb(215, 215, 215);
   font-size: 4em;
