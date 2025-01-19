@@ -41,11 +41,11 @@ groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
 const spotLight = new THREE.SpotLight( 0xffffff );
-spotLight.position.set(1, 2, 1);
+spotLight.position.set(0, 4, 0);
 spotLight.castShadow = true;
 scene.add( spotLight );
 
-const axesHelper = new THREE.AxesHelper( 5 );
+const axesHelper = new THREE.AxesHelper( 1 );
 scene.add( axesHelper );
 
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
@@ -61,8 +61,8 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(0, 0, 0);
-  mesh.scale.set(2, 2, 2);
+  mesh.position.set(-1, 0, 0);
+  mesh.scale.set(4, 4, 4);
   scene.add(mesh);
   
   document.getElementById('progress-container').style.display = 'none';
