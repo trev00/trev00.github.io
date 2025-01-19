@@ -14,14 +14,14 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .1, 100);
-camera.position.set(0,5,5);
+camera.position.set(0,2,2);
 camera.lookAt(0,2,0);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.enablePan = true;
-controls.minDistance = .5;
-controls.maxDistance = 5;
+controls.minDistance = 0;
+controls.maxDistance = 4;
 controls.minPolarAngle = 0.5;
 controls.maxPolarAngle = 1.5;
 controls.autoRotate = false;
@@ -64,7 +64,7 @@ loader.load('scene.glb', (glb) => {
   });
 
   mesh.position.set(-2, 2, 0);
-  mesh.scale.set(4, 4, 4);
+  mesh.scale.set(5, 5, 5);
   scene.add(mesh);
   
   document.getElementById('progress-container').style.display = 'none';
