@@ -65,7 +65,7 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(-2, 2, 0);
+  mesh.position.set(-3, 2, 0);
   mesh.scale.set(5, 5, 5);
   scene.add(mesh);
   
