@@ -19,8 +19,8 @@ camera.lookAt(0,0,0);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.enablePan = false;
-controls.minDistance = 0;
+controls.enablePan = true;
+controls.minDistance = .5;
 controls.maxDistance = 5;
 controls.minPolarAngle = 0.5;
 controls.maxPolarAngle = 1.5;
@@ -61,7 +61,7 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(-1, 0, 0);
+  mesh.position.set(-1, 1, 0);
   mesh.scale.set(4, 4, 4);
   scene.add(mesh);
   
