@@ -28,7 +28,7 @@ controls.autoRotate = false;
 controls.target = new THREE.Vector3(0, 1, 0);
 controls.update();
 
-const groundGeometry = new THREE.PlaneGeometry(5, 5, 8, 8);
+const groundGeometry = new THREE.PlaneGeometry(8, 8, 12, 12);
 groundGeometry.rotateX(-Math.PI / 2);
 
 const groundMaterial = new THREE.MeshStandardMaterial({
@@ -40,10 +40,13 @@ groundMesh.castShadow = false;
 groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
-const spotLight = new THREE.SpotLight( 0xffffff );
-spotLight.position.set(0, 4, 0);
-spotLight.castShadow = true;
-scene.add( spotLight );
+const topLight = new THREE.DirectionalLight(0xffffff, 1);
+topLight.position.set(500, 500, 500)
+topLight.castShadow = true;
+scene.add(topLight);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, .5);
+scene.add(ambientLight);
 
 const axesHelper = new THREE.AxesHelper( 1 );
 scene.add( axesHelper );
@@ -61,7 +64,7 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(-1, 1, 0);
+  mesh.position.set(-2, 2, 0);
   mesh.scale.set(4, 4, 4);
   scene.add(mesh);
   
