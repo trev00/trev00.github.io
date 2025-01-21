@@ -14,12 +14,12 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, .1, 100);
-camera.position.set(0,2,2);
+camera.position.set(2,5,10);
 
 const controls = new OrbitControls( camera, renderer.domElement );
 controls.update();
 
-const groundGeometry = new THREE.PlaneGeometry(8, 8, 12, 12);
+const groundGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
 groundGeometry.rotateX(-Math.PI / 2);
 
 const groundMaterial = new THREE.MeshStandardMaterial({
@@ -33,7 +33,7 @@ groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
 const topLight = new THREE.DirectionalLight(0x404040, 3.0);
-topLight.position.set(.32,.39,.7);
+topLight.position.set(0,25,0);
 topLight.castShadow = true;
 scene.add(topLight);
 
@@ -55,8 +55,8 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(-5, 2, 0);
-  mesh.scale.set(5, 5, 5);
+  mesh.position.set(-10, 2, 0);
+  mesh.scale.set(10, 10, 10);
   scene.add(mesh);
 
 
