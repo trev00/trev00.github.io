@@ -15,7 +15,6 @@ const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, .1, 100);
 camera.position.set(0,2,2);
-camera.lookAt(0,0,0);
 
 const controls = new OrbitControls( camera, renderer.domElement );
 controls.update();
@@ -48,9 +47,7 @@ const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
   console.log('loading model');
   
-  /*
-const mesh = glb.scene;
-
+  const mesh = glb.scene;
   mesh.traverse((child) => {
     if (child.isMesh) {
       child.castShadow = true;
@@ -65,11 +62,11 @@ const mesh = glb.scene;
 
   document.getElementById('progress-container').style.display = 'none';
 }, (xhr) => {
-  console.log(`jumping to hyperspace ${xhr.loaded / xhr.total * 100}%`);
+  console.log(`loading ${xhr.loaded / xhr.total * 100}%`);
 }, (error) => {
   console.error(error);
 });
-*/
+
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
