@@ -13,19 +13,12 @@ document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .1, 100);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, .1, 100);
 camera.position.set(0,2,2);
 camera.lookAt(0,0,0);
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.enablePan = true;
-controls.minDistance = 0;
-controls.maxDistance = 4;
-controls.minPolarAngle = 0.5;
-controls.maxPolarAngle = 1.5;
-controls.autoRotate = false;
-controls.target = new THREE.Vector3(0, 2, 0);
+cameraControls = new OrbitControls( camera, renderer.domElement );
+cameraControls.addEventListener( 'change', render );
 controls.update();
 
 const groundGeometry = new THREE.PlaneGeometry(8, 8, 12, 12);
