@@ -17,9 +17,9 @@ const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerH
 camera.position.set(0,2,2);
 camera.lookAt(0,0,0);
 
-cameraControls = new OrbitControls( camera, renderer.domElement );
+const cameraControls = new OrbitControls( camera, renderer.domElement );
 cameraControls.addEventListener( 'change', render );
-controls.update();
+cameraControls.update();
 
 const groundGeometry = new THREE.PlaneGeometry(8, 8, 12, 12);
 groundGeometry.rotateX(-Math.PI / 2);
@@ -40,10 +40,10 @@ scene.add(topLight);
 const ambientLight = new THREE.AmbientLight(0x404040, 3.0);
 scene.add(ambientLight);
 
-/*
+
 const axesHelper = new THREE.AxesHelper(2); // Size of 2 units
 scene.add(axesHelper);
-*/
+
 
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
@@ -58,7 +58,7 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(-3, 2, 0);
+  mesh.position.set(-5, 2, 0);
   mesh.scale.set(5, 5, 5);
   scene.add(mesh);
   
@@ -77,7 +77,7 @@ window.addEventListener('resize', () => {
 
 function animate() {
   requestAnimationFrame(animate);
-  controls.update();
+  cameraControls.update();
   renderer.render(scene, camera);
 }
 
