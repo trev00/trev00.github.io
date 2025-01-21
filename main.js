@@ -17,16 +17,17 @@ const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerH
 camera.position.set(0,2,2);
 camera.lookAt(0,0,0);
 
-const cameraControls = new OrbitControls( camera, renderer.domElement );
-cameraControls.addEventListener( 'change', render );
-cameraControls.update();
+const controls = new OrbitControls( camera, renderer.domElement );
+controls.update();
 
 const groundGeometry = new THREE.PlaneGeometry(8, 8, 12, 12);
 groundGeometry.rotateX(-Math.PI / 2);
+
 const groundMaterial = new THREE.MeshStandardMaterial({
   color: 0x555555,
   side: THREE.DoubleSide
 });
+
 const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
 groundMesh.castShadow = false;
 groundMesh.receiveShadow = true;
@@ -40,16 +41,15 @@ scene.add(topLight);
 const ambientLight = new THREE.AmbientLight(0x404040, 3.0);
 scene.add(ambientLight);
 
-
 const axesHelper = new THREE.AxesHelper(2); // Size of 2 units
 scene.add(axesHelper);
-
 
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
   console.log('loading model');
   
-  const mesh = glb.scene;
+  /*
+const mesh = glb.scene;
 
   mesh.traverse((child) => {
     if (child.isMesh) {
@@ -61,13 +61,15 @@ loader.load('scene.glb', (glb) => {
   mesh.position.set(-5, 2, 0);
   mesh.scale.set(5, 5, 5);
   scene.add(mesh);
-  
+
+
   document.getElementById('progress-container').style.display = 'none';
 }, (xhr) => {
   console.log(`jumping to hyperspace ${xhr.loaded / xhr.total * 100}%`);
 }, (error) => {
   console.error(error);
 });
+*/
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
