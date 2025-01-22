@@ -57,10 +57,10 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(-5, 2, 0);
-  mesh.scale.set(10, 10, 10);
+  mesh.position.set(-4, 2, 0);
+  mesh.scale.set(7, 7, 7);
   scene.add(mesh);
-
+camera.lookAt(mesh.position);
 
   document.getElementById('progress-container').style.display = 'none';
 }, (xhr) => {
