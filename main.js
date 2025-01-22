@@ -65,7 +65,7 @@ loader.load('scene.glb', (glb) => {
   const center = new THREE.Vector3();
   boundingBox.getCenter(center);
   mesh.position.sub(center);
-  mesh.position.setY(mesh.position.y + 1);
+  mesh.position.setY(mesh.position.y + 2);
   
   const axesHelper = new THREE.AxesHelper(2);
   axesHelper.position.copy(center);
