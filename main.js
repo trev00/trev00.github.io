@@ -42,16 +42,16 @@ groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 */
 
-const spotLight = new THREE.SpotLight(0x404040, 25, 100, 0.22, 1);
-spotLight.position.set(0, 25, 0);
+const spotLight = new THREE.SpotLight(0x404040, 15, 100, 0.22, 1);
+spotLight.position.set(0, 100, 0);
 spotLight.castShadow = true;
 spotLight.shadow.bias = -0.0001;
 scene.add(spotLight);
 
-const ambientLight = new THREE.AmbientLight(0x404040, 5);
+const ambientLight = new THREE.AmbientLight(0x404040, 20);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0x404040, 5);
+const directionalLight = new THREE.DirectionalLight(0x404040, 1);
 scene.add(directionalLight);
 
 const updateLightPosition = () => {
@@ -64,11 +64,13 @@ const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
   console.log('loading model');
   const mesh = glb.scene;
-  mesh.scale.set(20, 20, 20);
+  mesh.scale.set(25, 25, 25);
   mesh.traverse((child) => {
     if (child.isMesh) {
       child.castShadow = true;
       child.receiveShadow = true;
+      const material = child.material;
+            material.metalness = .94;
     }
   });
 
