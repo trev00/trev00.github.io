@@ -66,6 +66,13 @@ loader.load('scene.glb', (glb) => {
   boundingBox.getCenter(center);
   mesh.position.sub(center);
   mesh.position.setY(mesh.position.y + 1);
+  
+  const axesHelper = new THREE.AxesHelper(2);
+  axesHelper.position.copy(center);
+  scene.add(axesHelper);
+  const boxHelper = new THREE.BoxHelper(mesh, 0xff0000);
+  scene.add(boxHelper);
+  
   scene.add(mesh);
   
   document.getElementById('progress-container').style.display = 'none';
