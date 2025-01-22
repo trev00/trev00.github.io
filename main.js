@@ -14,7 +14,7 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, .1, 100);
-camera.position.set(2,5,10);
+camera.position.set(10,10,10);
 
 const controls = new OrbitControls( camera, renderer.domElement );
 controls.update();
@@ -32,7 +32,7 @@ groundMesh.castShadow = false;
 groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
-const spotLight = new THREE.SpotLight(0xffffff, 3000, 100, 0.22, 1);
+const spotLight = new THREE.SpotLight(0xffffff, 1);
 spotLight.position.set(0, 25, 0);
 spotLight.castShadow = true;
 spotLight.shadow.bias = -0.0001;
@@ -49,6 +49,7 @@ loader.load('scene.glb', (glb) => {
   console.log('loading model');
   
   const mesh = glb.scene;
+  console.log('Mesh:', mesh);
   mesh.traverse((child) => {
     if (child.isMesh) {
       child.castShadow = true;
@@ -56,7 +57,7 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(-10, 2, 0);
+  mesh.position.set(-5, 2, 0);
   mesh.scale.set(10, 10, 10);
   scene.add(mesh);
 
