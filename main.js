@@ -14,9 +14,17 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, .1, 100);
-camera.position.set(10,10,10);
+camera.position.set(4,5,11);
 
-const controls = new OrbitControls( camera, renderer.domElement );
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.enablePan = false;
+controls.minDistance = 5;
+controls.maxDistance = 20;
+controls.minPolarAngle = 0.5;
+controls.maxPolarAngle = 1.5;
+controls.autoRotate = false;
+controls.target = new THREE.Vector3(0, 1, 0);
 controls.update();
 
 const groundGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
@@ -32,16 +40,16 @@ groundMesh.castShadow = false;
 groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
-const spotLight = new THREE.SpotLight(0xffffff, 3);
+const spotLight = new THREE.SpotLight(0xffffff, 3000, 100, 0.22, 1);
 spotLight.position.set(0, 25, 0);
 spotLight.castShadow = true;
 spotLight.shadow.bias = -0.0001;
 scene.add(spotLight);
 
-const ambientLight = new THREE.AmbientLight(0x404040, 3);
+const ambientLight = new THREE.AmbientLight(0x404040, 1);
 scene.add(ambientLight);
 
-const axesHelper = new THREE.AxesHelper(2); // Size of 2 units
+const axesHelper = new THREE.AxesHelper(3);
 scene.add(axesHelper);
 
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
@@ -49,7 +57,6 @@ loader.load('scene.glb', (glb) => {
   console.log('loading model');
   
   const mesh = glb.scene;
-  console.log('Mesh:', mesh);
   mesh.traverse((child) => {
     if (child.isMesh) {
       child.castShadow = true;
@@ -57,18 +64,15 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(-4, 2, 0);
-  mesh.scale.set(7, 7, 7);
+  mesh.position.set(0, 1.05, -1);
   scene.add(mesh);
-camera.lookAt(mesh.position);
-
+  
   document.getElementById('progress-container').style.display = 'none';
 }, (xhr) => {
   console.log(`loading ${xhr.loaded / xhr.total * 100}%`);
 }, (error) => {
   console.error(error);
 });
-
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -78,7 +82,7 @@ window.addEventListener('resize', () => {
 
 function animate() {
   requestAnimationFrame(animate);
-  cameraControls.update();
+  controls.update();
   renderer.render(scene, camera);
 }
 
