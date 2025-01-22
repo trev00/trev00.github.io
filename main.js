@@ -46,18 +46,12 @@ spotLight.castShadow = true;
 spotLight.shadow.bias = -0.0001;
 scene.add(spotLight);
 
-/*
-const ambientLight = new THREE.AmbientLight(0x404040, 1);
-scene.add(ambientLight);
-*/
-
 const axesHelper = new THREE.AxesHelper(3);
 scene.add(axesHelper);
 
 const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
   console.log('loading model');
-  
   const mesh = glb.scene;
   mesh.traverse((child) => {
     if (child.isMesh) {
@@ -66,8 +60,12 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.scale.set(5, 5, 5);
-  mesh.position.set(-4, 1, 0);
+  const boundingBox = new THREE.Box3().setFromObject(mesh);
+  const center = new THREE.Vector3();
+  boundingBox.getCenter(center);
+  mesh.position.sub(center);
+  mesh.position.setY(mesh.position.y + 1);
+  mesh.scale.set(10, 10, 10);
   scene.add(mesh);
   
   document.getElementById('progress-container').style.display = 'none';
