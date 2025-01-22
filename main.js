@@ -53,7 +53,7 @@ const loader = new GLTFLoader().setPath('3dmodels/headtubelug/');
 loader.load('scene.glb', (glb) => {
   console.log('loading model');
   const mesh = glb.scene;
-  mesh.scale.set(20, 20, 20);
+  mesh.scale.set(10, 10, 10);
   mesh.traverse((child) => {
     if (child.isMesh) {
       child.castShadow = true;
