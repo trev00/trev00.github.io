@@ -42,16 +42,16 @@ groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 */
 
-const spotLight = new THREE.SpotLight(0x404040, 15, 100, 0.22, 1);
+const spotLight = new THREE.SpotLight(0xFAD6A5, 15, 100, 0.22, 2);
 spotLight.position.set(0, 100, 0);
 spotLight.castShadow = true;
 spotLight.shadow.bias = -0.0001;
 scene.add(spotLight);
 
-const ambientLight = new THREE.AmbientLight(0x404040, 20);
+const ambientLight = new THREE.AmbientLight(0x404040, 18);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0x404040, 1);
+const directionalLight = new THREE.DirectionalLight(0xFAD6A5, 2);
 scene.add(directionalLight);
 
 const updateLightPosition = () => {
