@@ -41,13 +41,15 @@ groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
 const spotLight = new THREE.SpotLight(0xffffff, 3000, 100, 0.22, 1);
-spotLight.position.set(0, 25, 0);
+spotLight.position.set(0, 50, 0);
 spotLight.castShadow = true;
 spotLight.shadow.bias = -0.0001;
 scene.add(spotLight);
 
+/*
 const ambientLight = new THREE.AmbientLight(0x404040, 1);
 scene.add(ambientLight);
+*/
 
 const axesHelper = new THREE.AxesHelper(3);
 scene.add(axesHelper);
@@ -64,7 +66,8 @@ loader.load('scene.glb', (glb) => {
     }
   });
 
-  mesh.position.set(0, 1.05, -1);
+  mesh.scale.set(5, 5, 5);
+  mesh.position.set(-4, 1, 0);
   scene.add(mesh);
   
   document.getElementById('progress-container').style.display = 'none';
