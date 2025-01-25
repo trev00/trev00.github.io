@@ -1,6 +1,6 @@
 # trev00.github.io
 
-**to-do**
+# to-do
 - [ ]add an fps counter
 - [ ]switch to react three fiber for new env
 - [ ]handle user data
@@ -9,9 +9,7 @@
 
 **performance updates** 
 - [ ]re-size the render to eliminate scaling needs
-- [ ]simplify lighting
+- [x]simplify lighting
 - [ ]reduce glb model complexity
 - [ ]remove metalness
 - [ ]cache bounding box instead of dynamically updating every frame
-
- 
