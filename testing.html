@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" 
+          content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <style>
+            p, hq {
+                color:gold;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div>
+            <h1>computer</h1>
+            <h3>IP Address:</h3>
+            <p id="ipEl"></p>
+            <p id="cityEl"></p>
+            <p id="orgEl"></p>
+            <p id="countryEl"></p>
+        </div>
+        <script>
+            const ipEl = document.getElementById("ipEl");
+            const cityEl = document.getElementById("cityEl");
+            const orgEl = document.getElementById("orgEl");
+            const countryEl = document.getElementById("countryEl");
+
+            document.addEventListener("DOMContentLoaded", function() {
+                fetch('http://ip-api.com/json/?fields=61439')
+                    .then((response) => response.json())
+                    .then((response) => {
+                        ipEl.textContent = response.query;
+                        cityEl.textContent = response.city;
+                        orgEl.textContent = response.org;
+                        countryEl.textContent = response.country;
+                        console.log(response);
+                    })
+            });
+        </script>
+        
+        <div>
+            <h1>computer</h1>
+            <h3>IP Address:</h3>
+            <p id="ip-address"></p>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                fetch('https://ipinfo.io/json')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("ip-address").textContent = data.ip;
+                    })
+                    .catch(error => {
+                        console.error("Error fetching IP address:", error);
+                        console.log(data);
+                    });
+            });
+        </script>
+        
+        <div>
+            <h1>GeeksforGeeks</h1>
+            <h3>Getting Client IP Address</h3>
+            <p id="ip-add"></p>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Fetch the IP address from the API
+                fetch("https://ipinfo.io/json") 
+                    .then(response => response.json())
+                    .then(data => {
+                        // Display the IP address on the screen
+                        document.getElementById("ip-add").textContent = 
+                            `IP Address: ${data.ip}`;
+                    })
+                    .catch(error => {
+                        console.error("Error fetching IP address:", error);
+                        document.getElementById("ip-add").textContent = 
+                            "Unable to retrieve IP address.";
+                    });
+            });
+        </script>
+        <script src="main.js"></script>
+    </body>
+</html>
