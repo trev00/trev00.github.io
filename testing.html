@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+    
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" 
-          content="width=device-width, initial-scale=1.0">
+		<meta charset="utf-8">
+		<title>headtubelug</title>
+
+		<link rel="stylesheet" href="/styles.css">
         <title>Document</title>
-        <style>
-            p, hq {
-                color:gold;
-            }
-        </style>
     </head>
     
     <body>
+
         <div>
-            <h1>computer</h1>
-            <h3>IP Address:</h3>
+            <h3>ip-api</h3>
             <p id="ipEl"></p>
             <p id="cityEl"></p>
             <p id="orgEl"></p>
@@ -41,38 +38,19 @@
         </script>
         
         <div>
-            <h1>computer</h1>
-            <h3>IP Address:</h3>
-            <p id="ip-address"></p>
-        </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                fetch('https://ipinfo.io/json')
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById("ip-address").textContent = data.ip;
-                    })
-                    .catch(error => {
-                        console.error("Error fetching IP address:", error);
-                        console.log(data);
-                    });
-            });
-        </script>
-        
-        <div>
-            <h1>GeeksforGeeks</h1>
-            <h3>Getting Client IP Address</h3>
+            <h3>api.ify</h3>
             <p id="ip-add"></p>
         </div>
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 // Fetch the IP address from the API
-                fetch("https://ipinfo.io/json") 
+                fetch("https://api.ipify.org?format=json") 
                     .then(response => response.json())
-                    .then(data => {
+                    .then(data2 => {
                         // Display the IP address on the screen
                         document.getElementById("ip-add").textContent = 
-                            `IP Address: ${data.ip}`;
+                            `IP Address: ${data2.ip}`;
+                            console.log(data2);
                     })
                     .catch(error => {
                         console.error("Error fetching IP address:", error);
@@ -81,6 +59,8 @@
                     });
             });
         </script>
+        
         <script src="main.js"></script>
+
     </body>
 </html>
