@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fishing — Trevor Tuck</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://server.arcgisonline.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500&display=swap">
+  <!-- Classic scripts, since leaflet.heat needs L as a global. Deferred scripts
+       and modules run in document order, so both are loaded before fishing.js. -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.155.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.155.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <div id="sidebar"></div>
+    <main>
+      <!-- A dashboard, not a report: the map is the one hero, with the totals
+           above it, and the trips are a feed of cards beside it on a wide
+           screen (styles.css, .dash). Hovering a card lights that trip's spots
+           on the map; clicking it flies the map there. -->
+      <article class="fishing">
+        <!-- The cover, from tools/prep_photos.py --cover, as a slim band behind
+             the title. object-position keeps the sun in frame as the banner
+             crops; if the files are missing the image removes itself and the
+             title shows plain. -->
+        <header class="cover slim">
+          <img src="/fishing/images/cover-1600.jpg"
+               srcset="/fishing/images/cover-960.jpg 960w, /fishing/images/cover-1600.jpg 1600w, /fishing/images/cover-3200.jpg 3200w"
+               sizes="(max-width: 800px) 100vw, 1400px" alt="The sun setting on the horizon over the water"
+               fetchpriority="high" style="object-position: 50% 58%" onerror="this.remove()">
+          <h1>Fishing</h1>
+        </header>
+
+        <div class="dash">
+          <div class="map-col">
+            <div class="stats" id="stats" role="list" aria-label="Totals"></div>
+            <div class="fishmap" id="fish-map" role="region" aria-label="Map of logged fishing spots"></div>
+          </div>
+
+          <section class="trips-col">
+            <h2>Trips</h2>
+            <div id="trips"></div>
+          </section>
+        </div>
+
+        <!-- The viewer: one photo at a time, with the arrows and the arrow
+             keys stepping through every photo on the page. -->
+        <dialog class="photo-view" id="photo-view" aria-label="Photo">
+          <form method="dialog"><button class="close" aria-label="Close">&times;</button></form>
+          <button type="button" class="step prev" aria-label="Previous photo">&#8249;</button>
+          <button type="button" class="step next" aria-label="Next photo">&#8250;</button>
+          <figure><img alt=""><figcaption><span class="cap"></span><span class="count"></span></figcaption></figure>
+        </dialog>
+
+        <section class="season-sec">
+          <h2>What's Biting</h2>
+          <figure class="box">
+            <div class="chart-legend" aria-hidden="true">
+              <span><i class="swatch l0"></i>Rare</span>
+              <span><i class="swatch l1"></i>Fair</span>
+              <span><i class="swatch l2"></i>Good</span>
+              <span><i class="swatch l3"></i>Peak</span>
+              <span><i class="swatch closed">×</i>Closed</span>
+            </div>
+            <div class="season-wrap">
+              <table class="season" id="season"></table>
+              <div class="chart-tip" hidden></div>
+            </div>
+            <figcaption>Seasonality by species and month near the Port of Los Angeles. &times; marks
+              a closed season; a count after a name is how many of that species this log has caught.
+              Hover a cell for details.</figcaption>
+          </figure>
+        </section>
+
+        <!-- Every trip's photos, newest first, as a row of squares. The last
+             square counts the rest; any of them opens the viewer. -->
+        <section class="gallery-sec" id="gallery-sec" hidden>
+          <h2>Photos</h2>
+          <div class="gallery" id="gallery"></div>
+        </section>
+
+      </article>
+    </main>
+  </div>
+  <script type="module" src="/site.js"></script>
+  <script type="module" src="/fishing/fishing.js"></script>
+</body>
+</html>

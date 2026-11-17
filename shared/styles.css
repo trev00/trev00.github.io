@@ -1,0 +1,1456 @@
+:root {
+  --bg: #18181b;      /* content field */
+  --rail: #09090b;    /* sidebar, darker than the field */
+  --text: rgba(255, 255, 255, .87);   /* modelviewer.dev's body color, inverted */
+  --dim: #9ca3af;
+  --line: rgba(255, 255, 255, .14);
+  --panel: rgba(255, 255, 255, .08);
+  --accent: #fad6a5;  /* peach, from the site's earlier warm key light */
+
+  /* Chart series: a one-hue ordinal ramp, low -> high, ending on the accent.
+     Validated as a ramp against --chart-surface, the .box panel over --bg. */
+  --series-1: #bc7d2f;
+  --series-2: #e3a764;
+  --series-3: #fad6a5;
+  --chart-surface: #2a2a2d;
+
+  /* The glow on the fishing map: the series ramp with one dimmer step below
+     it, up to the near-white --heat-3 at the point with the most fish.
+     fishing.js reads these once for a canvas, so print never sees them. */
+  --heat-0: #7a5226;
+  --heat-1: var(--series-1);
+  --heat-2: var(--series-2);
+  --heat-3: var(--series-3);
+  /* A trip that caught nothing glows gray instead. */
+  --heat-none-0: #5a5a60;
+  --heat-none-1: #9a9aa0;
+
+  /* Seasonality heatmap, Rare -> Peak, on the same amber ramp as the map's
+     glow, so the two read as one measure. Rare is a gray lifted off
+     --chart-surface, to sit halfway in lightness between the surface and Fair. */
+  --season-0: #383836;
+  --season-1: var(--heat-0);
+  --season-2: var(--series-1);
+  --season-3: var(--series-3);
+
+  /* Protected areas on the fishing map's ocean layer, in CDFW's own colors
+     (its ds582 service's renderer). CDFW fills them solid; here the fill is
+     translucent so depth and labels show through, and each outline is a darker
+     step of the same color, since CDFW's pure colors fall under 3:1 against
+     the pale water. The outlines hold 3.6-5.2:1 against it. */
+  --mpa-smr: #ff0000;         /* State/Federal Marine Reserve: no take */
+  --mpa-smr-line: #c00000;
+  --mpa-smca-nt: #a800e6;     /* State Marine Conservation Area (No-Take) */
+  --mpa-smca-nt-line: #7a00a8;
+  --mpa-smca: #0073ff;        /* State/Federal Marine Conservation Area: limited take */
+  --mpa-smca-line: #0050b4;
+  --mpa-special: #ff00c8;     /* Special Closure */
+  --mpa-special-line: #b8008f;
+
+  --rail-w: 315px;    /* modelviewer.dev's --sidebar-width */
+  --measure: 780px;   /* text and figures share one column */
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font: 400 16px/24px 'Rubik', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+canvas { display: block; }
+b { font-weight: 500; }
+a { color: var(--text); }
+a:hover { color: var(--accent); }
+
+/* Layout — narrow rail, content takes the rest of the page */
+
+.wrap {
+  display: grid;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 2rem 1.25rem 1.5rem;
+  background-color: var(--rail);
+}
+
+.fullname {
+  font-size: 1.35em;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.contact { padding: .5rem 0 1rem; font-size: .8em; line-height: 1.5; }
+.contact p { margin: 0 0 .15em; }
+.contact a { color: var(--dim); }
+
+nav { flex: 1; padding-top: 1.25rem; }
+nav ul { list-style: none; padding: 0; margin: 0; }
+nav a {
+  display: block;
+  padding: .3em 0;
+  font-size: .95em;
+  color: var(--dim);
+}
+nav a:hover { color: var(--text); }
+nav a[aria-current="page"] { color: var(--accent); }
+/* Localhost only: marks a drafts.js page, which isn't on the live site. */
+nav .draft-tag { margin-left: .4em; font-size: .75em; opacity: .6; }
+
+.fullname, nav a { text-decoration: none; }
+
+/* Article — free-floating text, no card */
+
+main { padding: 4.5rem 3rem 6rem; }
+
+/* The measure lives on the article, so everything inside shares one
+   centered column. Every page wraps its content in <article>. */
+article {
+  max-width: var(--measure);
+  margin: 0 auto;
+}
+/* A page that wants a 20% wider column, as the fishing page does for its
+   seasonality grid. */
+article.wide, article.fishing { max-width: calc(var(--measure) * 1.2); }
+/* A figure 15% wider than its column, as the fishing map is: 7.5% out each
+   side, or as far as the room beside the column allows (the 1rem leaves
+   space for a scrollbar), and never narrower than the column. */
+.breakout, .fishing .map-col {
+  margin-inline: calc(-1 * clamp(0px, (100vw - var(--rail-w) - 1rem - 100%) / 2, 7.5%));
+}
+
+h1, h2, h3, h4 {
+  font-weight: 400;
+  margin: 0 0 .12em;
+}
+h1 { font-size: 1.92em; line-height: 1.24em; }
+h2 { font-size: 1.72em; line-height: 1.32em; margin-top: 1.6em; }
+h3 { font-size: 1.4em;  line-height: 1.34em; margin-top: 1.4em; }
+h4 { font-size: 1.2em;  line-height: 1.4em;  margin-top: 1.2em; }
+
+h2::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 2px;
+  margin-bottom: 16px;
+  background: var(--text);
+}
+
+p { margin: .25em 0 1em; }
+
+.meta { color: var(--dim); margin-bottom: 2.5em; }
+
+/* Citations: a superscript marker in the prose, numbered list at the end. */
+sup { line-height: 0; }   /* so a marker or an R² doesn't push its line apart */
+sup a { text-decoration: none; color: var(--accent); }
+
+.refs { padding-left: 1.4em; }
+.refs li {
+  margin-bottom: .7em;
+  font-size: .85em;
+  line-height: 1.5;
+  color: var(--dim);
+  overflow-wrap: anywhere;   /* long URLs must not widen the column */
+}
+.refs a { color: var(--dim); }
+.refs li:target { color: var(--text); }
+
+/* A list of separate points: half a line between items, so they read 1.5-spaced. */
+.spaced li + li { margin-top: .5em; }
+
+/* Figures — small, quiet containers in the style of a code snippet */
+
+.box {
+  margin: 2.25em 0;
+  padding: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.box img { display: block; width: 100%; border-radius: 4px; }
+.box figcaption { margin-top: 10px; font-size: .85em; line-height: 1.5; color: var(--dim); }
+
+/* Code listings. The snippet scrolls inside the box rather than wrapping, so
+   Python's indentation still reads as indentation on a narrow screen. */
+.box pre {
+  margin: 0;
+  overflow-x: auto;
+  font-size: .8em;
+  line-height: 1.6;
+  tab-size: 4;
+}
+code, .box pre code {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+.box pre .cm { color: var(--dim); }        /* comments */
+.box pre .st { color: var(--accent); }     /* strings: PyBaMM parameter names */
+.box pre .kw { color: var(--series-1); }   /* def, return, if, else */
+
+.box table { width: 100%; border-collapse: collapse; font-size: .95em; }
+.box th, .box td { padding: .45em .6em; text-align: left; border-bottom: 1px solid var(--line); }
+.box th { font-weight: 500; }
+.box tr:last-child td { border-bottom: none; }
+
+/* viewer.js calls setSize(w, h, false), so CSS owns the canvas's display size
+   while the drawing buffer stays at devicePixelRatio. */
+.model, .highlight { position: relative; width: 100%; }
+.model canvas, .highlight canvas { width: 100%; height: 100%; }
+.model { aspect-ratio: 16 / 10; }
+.highlight { height: 150px; }
+
+/* Only body models get one — the sidebar model is rotate-only. */
+.model .reset {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: .35em .75em;
+  font: inherit;
+  font-size: .78em;
+  line-height: 1;
+  color: var(--dim);
+  background: rgba(9, 9, 11, .72);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.model .reset:hover { color: var(--text); border-color: var(--dim); }
+
+.model.failed::after {
+  content: 'model failed to load';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--dim);
+  font-size: .85em;
+}
+
+.box .num { text-align: right; font-variant-numeric: tabular-nums; }
+/* Out of flow, so a starred value keeps its decimal point in line with the column. */
+.box .star { position: absolute; color: var(--dim); }
+
+/* Wide display equations scroll inside the column instead of being clipped. */
+mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; }
+
+/* Charts — cells.js draws SVG line charts into .chart. Every color
+   is a token, so print restyles a chart without redrawing it. */
+
+.chart { position: relative; margin-bottom: 12px; }
+.chart:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+.chart svg { display: block; width: 100%; font-variant-numeric: tabular-nums; }
+
+.c1 { --c: var(--series-1); }
+.c2 { --c: var(--series-2); }
+.c3 { --c: var(--series-3); }
+.c-ink { --c: var(--text); }   /* a series set apart from the ramp; white here, black in print */
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25em 1.25em;
+  margin-bottom: 6px;
+  font-size: .85em;
+  color: var(--dim);
+}
+.chart-legend span { display: inline-flex; align-items: center; gap: .5em; }
+
+/* Line keys, not boxes: a short stroke of the series color. */
+.chart .key { display: inline-block; width: 16px; height: 2px; border-radius: 1px; background: var(--c); }
+
+.chart .grid line { stroke: var(--line); }
+.chart text { font-size: 12px; fill: var(--dim); }
+.chart .ref line { stroke: var(--dim); stroke-dasharray: 4 4; }
+.chart .series path { fill: none; stroke: var(--c); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .series circle { fill: var(--c); stroke: var(--chart-surface); stroke-width: 2; }
+.chart .series .past { stroke-dasharray: 6 5; }
+/* Hollow marker where a run ends at the discharge cut-off, so it reads as a
+   stopping point rather than as another sampled value. */
+.chart .series circle.stop { fill: var(--chart-surface); stroke: var(--c); }
+.chart .key.dash { background: repeating-linear-gradient(90deg, var(--dim) 0 5px, transparent 5px 8px); }
+.chart .key.dot { width: 7px; height: 7px; border-radius: 50%; background: none; border: 2px solid var(--dim); }
+.chart .series .value { fill: var(--text); }
+.chart .crosshair { stroke: var(--dim); }
+
+.chart-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 6px 10px;
+  font-size: .8em;
+  line-height: 1.6;
+  white-space: nowrap;
+  background: rgba(9, 9, 11, .92);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+.chart-tip p { margin: 0; color: var(--dim); }
+.chart-tip div { display: flex; align-items: center; gap: .5em; color: var(--dim); }
+.chart-tip b { color: var(--text); }
+
+/* Trade-off scatter — eicosane.js on the n-eicosane doping page. */
+
+.chart .ref .band { fill: var(--line); opacity: .5; }
+.chart .moves line { stroke: var(--dim); stroke-width: 1; opacity: .45; }
+.chart .points circle { stroke-width: 2; }
+.chart .focus-ring { fill: none; stroke: var(--text); stroke-width: 1; }
+.chart .key.fill { width: 8px; height: 8px; border-radius: 50%; }
+.chart-legend.c3 .key.dot { border-color: var(--c); }
+
+/* Two-button switch above a chart; the pressed one carries the accent. */
+.seg { display: inline-flex; margin-bottom: 10px; border: 1px solid var(--line); border-radius: 4px; }
+.seg button {
+  padding: .35em .75em;
+  font: inherit;
+  font-size: .78em;
+  line-height: 1.2;
+  color: var(--dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button:hover { color: var(--text); }
+.seg button[aria-pressed="true"] { color: var(--accent); background: var(--panel); }
+.seg button:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+
+.cite-line { margin-bottom: .6em; color: var(--dim); font-size: .9em; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Month charts and tables — casual.js on the Longshore Casual page. A forecast
+   is the series' own line dashed, over a wash of its low-to-high range. */
+
+.chart .series .fc { stroke-dasharray: 6 5; }
+.chart .series .band { fill: var(--c); stroke: none; opacity: .14; }
+.chart .series .fit { stroke-width: 1.5; opacity: .7; }   /* a scatter's least-squares line */
+/* A trend line through a year series, dotted so it doesn't read as a forecast. */
+.chart .series .trend { stroke: var(--dim); stroke-width: 1.5; stroke-dasharray: 2 4; }
+.chart .key.trend { background: repeating-linear-gradient(90deg, var(--dim) 0 2px, transparent 2px 6px); }
+/* A shaded span behind a series, edged in thin rules, as FRED marks recessions. */
+.chart .shade rect { fill: var(--dim); opacity: .16; }
+.chart .shade line { stroke: var(--dim); stroke-width: 1; opacity: .5; }
+.chart .series.daily path { stroke-width: 1.25; }   /* a point a day: a full line would merge */
+/* A daily series' average, cased and its label haloed in the surface so both read over the data. */
+.chart .series .mean-case { stroke: var(--chart-surface); stroke-width: 5; }
+.chart .series .mean { stroke-width: 2; }
+.chart text.mean-label { paint-order: stroke; stroke: var(--chart-surface); stroke-width: 4px; stroke-linejoin: round; }
+.chart .series circle.partial { fill: var(--chart-surface); stroke: var(--c); }
+.chart .bars path, .chart .bars rect { fill: var(--c); }
+.chart .bars .fc, .chart .key.bar.fc, .chart-tip .fc .key { opacity: .45; }
+.chart .err line { stroke: var(--text); stroke-width: 1; }
+.chart .hover { fill: var(--panel); }
+.chart text.value { fill: var(--text); }
+.chart .key.bar { width: 10px; height: 10px; border-radius: 2px; }
+
+/* Two small charts side by side, stacked on a phone. */
+.chart-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.chart-pair .chart-title { margin-bottom: 6px; font-size: .85em; color: var(--dim); }
+@media (max-width: 640px) { .chart-pair { grid-template-columns: 1fr; } }
+
+/* A wide table scrolls inside its box rather than widening the column. */
+.box .scroll { overflow-x: auto; }
+.box .scroll table { min-width: 520px; }
+.box .scroll.wide table { min-width: 980px; }
+.box .scroll td:first-child { white-space: nowrap; }
+.box .range { display: block; font-size: .8em; color: var(--dim); white-space: nowrap; }
+
+/* Fishing — fishing.js draws the Leaflet map, the trip table, and the
+   seasonality heatmap. */
+
+/* z-index 0 makes the map its own stacking context, so Leaflet's panes and
+   controls (z-index up to 1000) stay inside it. */
+.fishmap.leaflet-container {
+  position: relative;
+  z-index: 0;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  font: inherit;
+  /* The ocean layer's water, so tiles still loading don't flash dark on the
+     default map. */
+  background: #accae6;
+}
+.fishmap.failed::after {
+  content: 'map failed to load';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--dim);
+  font-size: .85em;
+}
+/* The basemap switch (fishing.js): a picture of the map a click switches to,
+   framing the coast from Palos Verdes to Newport with Catalina below. That
+   stretch sits on two side-by-side zoom-8 Esri tiles (row 102, columns 43 and
+   44), drawn 100px wide and shifted so it fills the button. */
+.fishmap .layer-toggle {
+  box-sizing: border-box;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+  background-color: #0b1a24;
+  background-image:
+    url(https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/8/102/43),
+    url(https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/8/102/44);
+  background-origin: border-box;
+  background-position: -61px -35px, 39px -35px;
+  background-size: 100px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+.fishmap .layer-toggle.to-ocean {
+  background-color: #accae6;
+  background-image:
+    url(https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/8/102/43),
+    url(https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/8/102/44);
+}
+.fishmap .layer-toggle:hover { border-color: var(--accent); }
+.fishmap .layer-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* leaflet.heat's canvas covers the whole map above the protected-area pane;
+   without pointer-events: none it swallows every hover and click on the zones.
+   The trip dots carry their own hit targets. */
+.fishmap .leaflet-heatmap-layer { opacity: .7; pointer-events: none; }
+/* Undo .box img's rounded corners, which left a diamond where four tiles met.
+   Normal blending, since Leaflet's plus-lighter would brighten the 2px tile
+   overlap that fishing.js adds. */
+.fishmap img.leaflet-tile { border-radius: 0; mix-blend-mode: normal; }
+/* A trip card under the pointer (fishing.js focus): everything else's glow,
+   troll lines and dots fade, and the trip's own layers, redrawn on top with
+   the .lit class, hold at full strength and breathe. The hover targets are
+   invisible paths too, so dimming them changes nothing. */
+.fishmap .leaflet-heatmap-layer, .fishmap .leaflet-overlay-pane path { transition: opacity .25s; }
+.fishmap.focus .leaflet-heatmap-layer { opacity: .15; }
+.fishmap.focus .leaflet-overlay-pane path { opacity: .12; }
+.fishmap.focus .leaflet-heatmap-layer.lit { opacity: 1; animation: breathe 1.8s ease-in-out infinite; }
+.fishmap.focus .leaflet-overlay-pane path.lit { opacity: 1; }
+@keyframes breathe { 50% { opacity: .7; } }
+@media (prefers-reduced-motion: reduce) { .fishmap.focus .leaflet-heatmap-layer.lit { animation: none; } }
+
+/* The map's data credit, a Leaflet control in the map's bottom-left corner,
+   where Esri requires it. 12px is the smallest size Esri allows, so it holds
+   there on a phone too. A dark wash keeps it legible on the satellite's water
+   and the ocean map's pale blue alike; it wraps rather than crossing the map. */
+.fishmap .map-credit {
+  margin: 0 0 4px 4px;
+  padding: 2px 7px;
+  max-width: min(70%, 520px);
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, .85);
+  background: rgba(9, 9, 11, .7);
+  border-radius: 4px;
+}
+.fishmap .map-credit a { color: inherit; }
+@media (max-width: 640px) { .fishmap .map-credit { max-width: calc(100% - 8px); } }
+
+/* Key for the protected areas, under the map. */
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25em 1.25em;
+  margin: 8px 0 0;
+  font-size: .85em;
+  color: var(--dim);
+}
+.map-legend[hidden] { display: none; }
+.map-legend span { display: inline-flex; align-items: center; gap: .5em; }
+/* Swatches that look like the zones: the 25% fill over the ocean layer's
+   water, inside the darker outline. */
+.zone-key { display: inline-block; width: 12px; height: 12px; border: 1.5px solid; border-radius: 2px; }
+.zone-key.smr { border-color: var(--mpa-smr-line); background: color-mix(in srgb, var(--mpa-smr) 25%, #accae6); }
+.zone-key.smca-nt { border-color: var(--mpa-smca-nt-line); background: color-mix(in srgb, var(--mpa-smca-nt) 25%, #accae6); }
+.zone-key.smca { border-color: var(--mpa-smca-line); background: color-mix(in srgb, var(--mpa-smca) 25%, #accae6); }
+.zone-key.special { border-color: var(--mpa-special-line); background: color-mix(in srgb, var(--mpa-special) 25%, #accae6); }
+.zone-flag { color: var(--dim); font-size: .9em; }
+
+/* Click a protected area: its rules and links, in the .map-tip look. */
+.map-pop .leaflet-popup-content-wrapper,
+.map-pop .leaflet-popup-tip {
+  color: var(--dim);
+  background: rgba(9, 9, 11, .92);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+.map-pop .leaflet-popup-content-wrapper { border-radius: 6px; }
+.map-pop .leaflet-popup-content { margin: 8px 12px; font-size: .8em; line-height: 1.6; }
+.map-pop .leaflet-popup-content p { margin: 0; }
+.map-pop b { color: var(--text); }
+.map-pop a { color: var(--accent); }
+.map-pop a.leaflet-popup-close-button { color: var(--dim); }
+/* Zone rules run long, so let that tooltip wrap. */
+.leaflet-tooltip.zone-tip { width: max-content; max-width: 280px; white-space: normal; }
+
+/* The .chart-tip look, on Leaflet's tooltip. */
+.leaflet-tooltip.map-tip {
+  padding: 6px 10px;
+  font-size: .8em;
+  line-height: 1.6;
+  color: var(--dim);
+  background: rgba(9, 9, 11, .92);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: none;
+  font-variant-numeric: tabular-nums;
+}
+.leaflet-tooltip-top.map-tip::before { border-top-color: var(--line); }
+.map-tip b { color: var(--text); }
+.map-tip p { margin: 0; }
+
+/* The fishing page is a dashboard, not a report: section titles are small
+   labels without the rule, the figure under the grid has no number, and the
+   blocks sit tight within a section and loose between sections. */
+.fishing h2 {
+  margin: 0 0 12px;
+  font-size: .8em;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.fishing h2::before { display: none; }
+.fishing .dash { margin-bottom: 56px; }
+.fishing .map-col { margin-bottom: 40px; }
+.fishing .season-sec .box { margin-top: 0; }
+
+/* The totals: a big number over a small label, in a row of tiles that wraps
+   on a phone. */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  gap: 8px;
+  margin: 0 0 12px;
+}
+.stats div {
+  padding: 10px 12px 9px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.stats b {
+  display: block;
+  font-size: 1.55em;
+  line-height: 1.15;
+  font-weight: 500;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.stats b small { font-size: .6em; font-weight: 400; color: var(--dim); }
+.stats span {
+  display: block;
+  margin-top: 2px;
+  font-size: .72em;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* Trip cards. The spot is the title; the catch is a row of chips; the photos
+   are a strip of square crops that open in the viewer. Hovering a card lights
+   its trip on the map. */
+.trip {
+  margin: 0 0 12px;
+  padding: 14px 16px 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  transition: border-color .2s;
+}
+.trip:hover, .trip:focus-within { border-color: var(--accent); }
+.trip:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+.trip .n {
+  display: block;
+  font-size: .72em;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.trip header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0 12px;
+  margin-top: 2px;
+}
+.trip h3 { margin: 0; font-size: 1.15em; line-height: 1.3; font-weight: 500; }
+.trip .when { margin: 0; font-size: .88em; color: var(--dim); }
+.trip .goal { white-space: nowrap; }
+.trip .zone-flag { margin: 4px 0 0; }
+.trip .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.chip {
+  padding: 1px 10px;
+  font-size: .82em;
+  line-height: 1.7;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--dim);
+}
+.chip.fish { color: var(--accent); border-color: color-mix(in srgb, var(--series-1) 70%, transparent); }
+.trip .notes { margin: 10px 0 0; font-size: .95em; }
+.trip .photos { margin-top: 12px; }
+.trip .photos img { border-radius: 4px; }
+
+/* The gallery: a row of six squares, three to a row on a phone. The last one
+   is shaded under a count of the photos it stands for. */
+.gallery { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.gallery figure { position: relative; margin: 0; }
+.gallery img { display: block; width: 100%; aspect-ratio: 1; height: auto; object-fit: cover; border-radius: 6px; }
+.gallery a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.gallery .more span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: .95em;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(0, 0, 0, .55);
+  border-radius: 6px;
+  pointer-events: none;
+}
+@media (max-width: 640px) { .gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; } }
+
+/* From a wide laptop up, the map pins beside the trips: it stays in view as
+   the cards scroll past and light it up. The trips label goes, so the totals
+   sit level with the first card. */
+@media (min-width: 1400px) {
+  article.fishing { max-width: 1400px; }
+  .fishing .map-col { margin: 0; }
+  .fishing .dash {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+  }
+  .fishing .trips-col h2 { display: none; }
+  .fishing .map-col { position: sticky; top: 24px; }
+  /* The trips scroll in their own column, no taller than the window, until
+     the last card is reached; then the wheel carries on down the page to the
+     grid and the gallery. A right gutter keeps the thin scrollbar off the
+     cards. */
+  .fishing .trips-col {
+    position: sticky;
+    top: 24px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    padding: 0 10px 0 3px;   /* 3px so a focused card's outline isn't clipped */
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+  .fishing .trips-col .trip:last-child { margin-bottom: 0; }
+  .fishing .fishmap.leaflet-container { aspect-ratio: 4 / 3; }
+  .fishing .season-sec, .fishing .gallery-sec { max-width: calc(var(--measure) * 1.2); }
+}
+.fishing .gallery-sec { margin-top: 56px; }
+
+/* The cover: a banner photo behind the title, which sits in its top left
+   corner. The corner is shaded 45% so white text holds 5.5:1 over the
+   cover's typical sky there; the shadow lifts it over the brighter streaks.
+   With no image (it removes itself when the file is missing) the title is
+   plain again. */
+.cover:has(img) {
+  position: relative;
+  aspect-ratio: 5 / 2;
+  margin-bottom: 2.5em;
+  padding: 1.25rem 1.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  isolation: isolate;   /* so the image's z-index -1 stays inside the banner */
+}
+/* The slim band on the fishing page: just tall enough for the title, so the
+   map below it is the one hero. */
+.cover.slim:has(img) { aspect-ratio: 5 / 1; margin-bottom: 32px; display: flex; flex-direction: column; justify-content: flex-end; }
+/* The title sits at the bottom of the band, so the shade comes up from there. */
+.cover.slim:has(img)::before { background: linear-gradient(to top, rgba(0, 0, 0, .55), transparent 75%); }
+@media (max-width: 640px) { .cover.slim:has(img) { aspect-ratio: 3 / 1; } }
+.cover img { position: absolute; inset: 0; z-index: -1; display: block; width: 100%; height: 100%; object-fit: cover; }
+.cover:has(img)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top left, rgba(0, 0, 0, .45), transparent 60%);
+}
+.cover:has(img) h1, .cover:has(img) .meta {
+  position: relative;
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .5);
+}
+.cover:has(img) .meta { margin: 0; color: rgba(255, 255, 255, .85); }
+@media (max-width: 640px) { .cover:has(img) { aspect-ratio: 16 / 9; } }
+
+/* A trip's photos share one row, however many there are, each an equal share,
+   as square crops; the viewer shows them whole. */
+.photos { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; }
+.photos figure { margin: 0; }
+.photos img { display: block; width: 100%; aspect-ratio: 1; height: auto; object-fit: cover; }
+
+.photo-view {
+  max-width: 90vw;
+  max-height: 90vh;
+  padding: 0;
+  color: var(--text);
+  background: var(--rail);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.photo-view::backdrop { background: rgba(0, 0, 0, .8); }
+.photo-view figure { margin: 0; }
+.photo-view img { display: block; max-width: 90vw; max-height: calc(90vh - 3em); width: auto; height: auto; }
+.photo-view figcaption { display: flex; justify-content: space-between; gap: 16px; padding: 8px 12px; font-size: .85em; color: var(--dim); }
+.photo-view .count { white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* Previous and next, on the photo's edges at mid height. */
+.photo-view .step {
+  position: absolute;
+  top: calc(50% - 1.5em);
+  width: 40px;
+  height: 40px;
+  padding: 0 0 4px;
+  font: inherit;
+  font-size: 1.8em;
+  line-height: 1;
+  color: #fff;
+  background: rgba(0, 0, 0, .55);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.photo-view .step:hover { background: rgba(0, 0, 0, .8); }
+.photo-view .step:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.photo-view .prev { left: 8px; }
+.photo-view .next { right: 8px; }
+.photo-view .close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  font: inherit;
+  font-size: 1.2em;
+  color: #fff;
+  background: rgba(0, 0, 0, .55);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  font-style: normal;
+  font-size: 9px;
+  line-height: 9px;
+  text-align: center;
+}
+.season-wrap { position: relative; }
+.box table.season {
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 2px;
+  font-size: .8em;
+  line-height: 1.3;
+}
+.box .season th, .box .season td { padding: 0; border: none; }
+.season th { font-weight: 400; color: var(--dim); text-align: center; }
+/* In em, so the name column grows with the text on large screens. Names that
+   still don't fit wrap rather than get cut off. */
+.season thead th:first-child { width: 8em; }
+.season tbody th {
+  padding-right: 4px;
+  color: var(--text);
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+/* A species this log has caught: its row name carries the count, in the accent. */
+.season tbody th.caught { font-weight: 500; }
+.season tbody th .n { color: var(--accent); font-weight: 400; white-space: nowrap; }
+.season thead th.now { color: var(--text); font-weight: 500; }
+.season tbody td { height: 26px; border-radius: 3px; }
+/* Only this month's best fish: the cells at the column's highest level. */
+.season tbody td.hot { outline: 1.5px solid var(--text); }
+.season tfoot td { font-size: .9em; font-weight: 500; text-align: center; color: var(--text); }
+.season .l0, .swatch.l0 { background: var(--season-0); }
+.season .l1, .swatch.l1 { background: var(--season-1); }
+.season .l2, .swatch.l2 { background: var(--season-2); }
+.season .l3, .swatch.l3 { background: var(--season-3); }
+.season .closed, .swatch.closed {
+  color: var(--dim);
+  text-align: center;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+@media only screen and (min-width: 1664px) {
+  body { font-size: 18px; line-height: 26px; }
+  main { padding: 5rem 4rem 7rem; }
+}
+
+@media only screen and (max-width: 800px) {
+  body { font-size: 14px; line-height: 22px; }
+
+  h1 { font-size: 1.8em;  line-height: 1.4em; }
+  h2 { font-size: 1.56em; line-height: 1.36em; }
+  h3 { font-size: 1.2em;  line-height: 1.48em; font-weight: 500; }
+  h4 { font-size: 1em;    line-height: 1.5em; }
+
+  .wrap { grid-template-columns: minmax(0, 1fr); }
+  .breakout, .fishing .map-col { margin-inline: 0; }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    flex-flow: row wrap;
+    align-items: baseline;
+    gap: 0 1rem;
+    padding: 1.25rem 1.5rem;
+  }
+
+  /* Hidden, so it never intersects and site.js never downloads the model. */
+  .contact, .highlight { display: none; }
+
+  nav { flex: 1 0 100%; padding-top: .75rem; }
+  nav ul { display: flex; flex-wrap: wrap; gap: 0 1.1rem; }
+
+  main { padding: 2rem 1.5rem 4rem; }
+}
+
+/* Print / save-as-PDF: body content only, on white.
+   Redefining the tokens flips the whole palette in one place. */
+@media print {
+  :root {
+    --bg: #fff;
+    --rail: #fff;
+    --text: #000;
+    --dim: #444;
+    --line: #bbb;
+    --panel: transparent;
+    --accent: #000;
+
+    /* The same ramp stepped for white paper, validated against #fff. */
+    --series-1: #da975d;
+    --series-2: #bb6e20;
+    --series-3: #904c00;
+    --chart-surface: #fff;
+
+    /* On paper, the amber ramp stepped for white: near-white -> the dark end. */
+    --season-0: #f1efe8;
+    --season-1: #f0d9bd;
+    --season-2: #da975d;
+    --season-3: #904c00;
+  }
+
+  /* Drop the site chrome — the article is the document. */
+  .sidebar, .model .reset, .chart-tip, .chart .crosshair { display: none; }
+  .wrap { display: block; }
+  main { padding: 0; }
+  article, article.wide, article.fishing { max-width: 100%; }
+  .fishing .dash { display: block; }
+  .fishing .map-col { position: static; }
+  .trip { break-inside: avoid; }
+
+  body { font-size: 11pt; line-height: 1.5; }
+
+  /* Keep figures whole and headings attached to what follows. */
+  .box { break-inside: avoid; }
+  h1, h2, h3, h4 { break-after: avoid; }
+  figcaption { break-before: avoid; }
+
+  /* Models are wider than tall on paper; cap so one doesn't eat a page. */
+  .model { aspect-ratio: 16 / 9; }
+}
+
+/* X2D filament matrix — the datasheet table on the X2D page; matrix.js sorts
+   it. Appended last, where the page's inline <style> used to sit, so it still
+   wins every tie with the rules above. */
+
+/* Layout: a printed material datasheet. Centered header and quick picks, then one full-width matrix that fits the page (cards on narrow screens), then sources. */
+/* Tokens are scoped to .fm, not :root, so they don't override styles.css's
+   --bg/--line/--accent for the sidebar. The site is dark-only, so this is the
+   matrix's dark palette, always on. */
+.fm {
+  --bg: #111418; --surface: #181c22; --ink: #e5e8ec; --muted: #9aa3ae;
+  --line: #2c323b; --line-soft: #222831; --row-hover: #1d222a;
+  --accent: #86aef0; --accent-ink: #10151c; --accent-soft: #1f2c43;
+  --cf: #e2e6eb; --cf-ink: #15181c; --gf: #173a31; --gf-ink: #9fd9c6;
+  --warn: #f0b65a; --warn-bg: #3a2b12; --track: #262c35; --pip-off: #343b46;
+  --g1: #a9b6c3; --g2: #5cc79c; --g3: #f0a04b; --g4: #86aef0; --g5: #5fc3de; --g6: #ef7a7a;
+  --miss: #f26d6d; --nf: #2a3039; --nf-ink: #c4ccd6;
+  --f-display: "Barlow Semi Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+
+/* The matrix needs more room than the site's 780px text measure. */
+article.full { max-width: 1720px; }
+
+.fm, .fm * { box-sizing: border-box; }
+.fm {
+  font-family: var(--f-body);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--ink);
+  max-width: 1720px;
+  margin: 0 auto;
+  display: grid;
+  gap: 32px;
+}
+.fm > * { min-width: 0; }
+.fm p { margin: 0; }
+/* styles.css draws a rule above every h2; the matrix's h2s are small labels. */
+.fm h2::before { display: none; }
+
+.fm h2 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+
+/* Quick picks: the side padding equals the gap, so the space between boxes
+   matches the space from the outer boxes to the table's edges. */
+.fm .picks {
+  --pick-gap: 28px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--pick-gap);
+  padding-inline: var(--pick-gap);
+}
+.fm .pick {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: grid;
+  gap: 2px;
+  align-content: start;
+  padding: 8px 16px;
+  background: var(--surface);
+  border: 1px solid var(--glow);
+  border-radius: 6px;
+}
+.fm .pick { --glow: var(--accent); }
+.fm .pick:nth-child(1) { --glow: var(--g1); }
+.fm .pick:nth-child(2) { --glow: var(--g2); }
+.fm .pick:nth-child(3) { --glow: var(--g3); }
+.fm .pick:nth-child(4) { --glow: var(--g4); }
+.fm .pick:nth-child(5) { --glow: var(--g5); }
+.fm .pick:nth-child(6) { --glow: var(--g6); }
+.fm .pick .need { --glow-ink: color-mix(in srgb, var(--glow) 70%, var(--ink)); }
+.fm .pick:hover { background: var(--row-hover); }
+.fm .pick:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fm .pick .need { font-size: 14.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--glow-ink, var(--muted)); }
+.fm .pick .mat { font-family: var(--f-display); font-weight: 600; font-size: 23px; line-height: 1.2; }
+.fm .pick .why { font-size: 15px; color: var(--muted); }
+
+/* Rank and sortable headers */
+.fm td.rank, .fm th.rank-h { padding-inline: 6px; text-align: center; font-family: var(--f-data); font-size: 14px; color: var(--muted); }
+.fm td.rank { font-weight: 500; color: var(--accent); }
+.fm .sort { all: unset; cursor: pointer; display: block; border-radius: 3px; }
+.fm .sort:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fm .sort:hover .lbl { color: var(--accent); }
+.fm .sort .lbl::after { content: "\2195"; margin-left: 5px; font-size: 13px; color: var(--muted); }
+.fm th[aria-sort="descending"] .sort .lbl::after { content: "\2193"; color: var(--accent); }
+.fm th[aria-sort="ascending"] .sort .lbl::after { content: "\2191"; color: var(--accent); }
+.fm th[aria-sort="descending"] .lbl, .fm th[aria-sort="ascending"] .lbl { color: var(--accent); }
+/* old sort buttons (unused) */
+.fm .toolbar { display: grid; gap: 10px; margin-bottom: 14px; }
+.fm .toolbar h2 { margin: 0; }
+.fm .sorts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.fm .sorts-label { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+.fm .sortbtn {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  padding: 7px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.fm .sortbtn:hover { border-color: var(--accent); }
+.fm .sortbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fm .sortbtn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+
+/* Matrix: fixed layout so it always fits the page width */
+.fm .matrix-wrap {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.fm table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 16px;
+}
+.fm col.c-rank { width: 44px; }
+.fm col.c-mat { width: 13%; }
+.fm col.c-str { width: 12.5%; }
+.fm col.c-heat { width: 11%; }
+.fm col.c-dim { width: 10.5%; }
+.fm col.c-life { width: 10.5%; }
+.fm col.c-post { width: 10.5%; }
+.fm col.c-sup { width: 14%; }
+.fm col.c-print { width: 18%; }
+.fm th, .fm td {
+  padding: 16px 16px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line-soft);
+  overflow-wrap: anywhere;
+}
+.fm td + td, .fm th + td { border-left: 1px solid var(--line-soft); }
+.fm tbody tr:last-child > * { border-bottom: 0; }
+.fm thead th {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 1.2;
+  overflow-wrap: normal;
+  border-bottom: 1px solid var(--line);
+  padding-block: 14px 12px;
+}
+.fm thead th + th { border-left: 1px solid var(--line-soft); }
+.fm .unit { display: block; font-family: var(--f-body); font-weight: 400; font-size: 14px; color: var(--muted); margin-top: 3px; }
+.fm tbody tr:hover > * { background: var(--row-hover); }
+.fm tbody tr.hl > * { background: var(--accent-soft); }
+
+.fm .mname { font-family: var(--f-display); font-weight: 600; font-size: 21px; line-height: 1.15; display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+.fm .chip {
+  font-family: var(--f-data);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.fm .chip.cf { background: var(--cf); color: var(--cf-ink); }
+.fm .chip.gf { background: var(--gf); color: var(--gf-ink); }
+.fm .chip.nf { background: var(--nf); color: var(--nf-ink); }
+.fm .base { display: block; margin-top: 4px; font-size: 15px; line-height: 1.35; color: var(--muted); font-weight: 400; }
+.fm .buy {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 5px 9px;
+  border: 1px solid var(--accent);
+  border-radius: 5px;
+  color: var(--accent);
+  text-decoration: none;
+  font-family: var(--f-body);
+  font-weight: 600;
+  font-size: 14.5px;
+  line-height: 1.25;
+}
+.fm .buy .bp { font-weight: 400; font-size: 13px; font-variant-numeric: tabular-nums; }
+.fm .buy:hover { background: var(--accent); color: var(--accent-ink); }
+.fm .buy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.fm .kv { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 16px; line-height: 1.4; }
+.fm .kv + .kv, .fm .bar + .kv, .fm .sub + .kv { margin-top: 7px; }
+.fm .kv .k { color: var(--muted); }
+.fm .kv .v { font-family: var(--f-data); font-size: 15px; font-variant-numeric: tabular-nums; text-align: right; }
+.fm .est { cursor: help; text-decoration: underline dotted var(--muted); text-underline-offset: 3px; }
+.fm .bar { display: block; height: 4px; margin-top: 5px; background: var(--track); border-radius: 2px; overflow: hidden; }
+.fm .bar > span { display: block; height: 100%; background: var(--accent); }
+.fm .na { color: var(--muted); }
+/* Data not yet published or measured: red label, to be filled in from test prints. */
+.fm .kv.missing .k, .fm .miss { color: var(--miss); }
+.fm .sub { font-size: 14.5px; line-height: 1.4; color: var(--muted); margin-top: 3px; }
+.fm .flags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.fm .flag { font-size: 14px; color: var(--warn); background: var(--warn-bg); border-radius: 3px; padding: 1px 7px; }
+
+.fm .rating { display: flex; align-items: center; gap: 7px; }
+.fm .rate-k { margin-top: 12px !important; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.fm .rate-k + .rating { margin-top: 4px; }
+.fm .pips { display: inline-flex; gap: 3px; }
+.fm .pips i { width: 12px; height: 12px; border-radius: 2px; background: var(--pip-off); }
+.fm .pips i.on { background: var(--accent); }
+.fm .score { font-family: var(--f-data); font-size: 14px; color: var(--muted); }
+.fm .note { margin-top: 7px; font-size: 16px; line-height: 1.5; color: var(--muted); }
+
+.fm .sup-best { font-weight: 600; font-size: 16.5px; line-height: 1.4; }
+.fm .sup-alt { margin-top: 10px; font-size: 16px; line-height: 1.4; }
+.fm .alt-k { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-right: 2px; }
+.fm .price {
+  font-family: var(--f-data);
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--track);
+  border-radius: 3px;
+  padding: 1px 6px;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+.fm .spool { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 5px; white-space: nowrap; }
+
+.fm .sup-name { display: block; }
+.fm .buy-sm { margin-top: 6px; font-size: 13.5px; padding: 3px 8px; }
+.fm .buy-sm .bp { font-size: 12.5px; }
+
+/* Sources */
+.fm .sources ul {
+  margin: 0;
+  padding-left: 18px;
+  columns: 2 300px;
+  column-gap: 32px;
+  font-size: 14.5px;
+  color: var(--muted);
+}
+.fm .sources li { break-inside: avoid; margin-bottom: 4px; }
+.fm .sources a { color: var(--accent); text-underline-offset: 2px; }
+.fm .sources a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Narrower screens: each material becomes a card */
+/* 1600, not 1280: the site sidebar and main padding take ~410px of the viewport. */
+@media (max-width: 1600px) {
+  .fm .matrix-wrap { background: none; border: 0; border-radius: 0; }
+  .fm table, .fm tbody, .fm tr, .fm th, .fm td { display: block; width: 100%; }
+  .fm colgroup { display: none; }
+  .fm thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .fm tbody { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 14px; }
+  .fm tbody tr {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .fm th, .fm td, .fm tbody tr:last-child > * { border: 0; border-bottom: 1px solid var(--line-soft); }
+  .fm td + td, .fm th + td { border-left: 0; }
+  .fm tbody tr > *:last-child { border-bottom: 0; }
+  .fm th.mat { padding-block: 4px 14px; }
+  .fm td.rank { text-align: left; padding: 12px 16px 0; border-bottom: 0 !important; }
+  .fm td.rank::before { content: "#"; }
+  .fm td:not(.rank)::before {
+    content: attr(data-label);
+    display: block;
+    font-family: var(--f-display);
+    font-weight: 600;
+    font-size: 12.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .fm tbody tr:hover > * { background: transparent; }
+  .fm tbody tr.hl { border-color: var(--accent); }
+  .fm tbody tr.hl > * { background: var(--accent-soft); }
+}
+@media (max-width: 640px) {
+  .fm { gap: 24px; }
+  .fm .picks { --pick-gap: 14px; }
+  .fm .sortbtn { padding: 6px 10px; font-size: 13.5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fm * { scroll-behavior: auto !important; }
+}
+
+/* Test-rig figures. Every rig SVG is written by a build script and carries
+   only classes; the colors are tokens on .rig, so print restyles a figure without a
+   redraw. A net differs from the others by weight and dash as well as color,
+   so the diagram still reads in grayscale. */
+
+.rig {
+  --rig-bg: #2a2a2d;          /* the .box panel over --bg; also the casing at crossings */
+  --rig-pos: #f2735f;         /* pack +: 10 AWG and the charger's + lead */
+  --rig-neg: #5fa8f5;         /* pack -: blue, since black won't read on this site */
+  --rig-tap: #e8c547;         /* fused voltage taps and the shunt's sense pair */
+  --rig-th: #5fcf9a;          /* thermistor pairs */
+  --rig-ctl: #c792ea;         /* 12 V: coil line and soak heater */
+  --rig-logic: #4fd0d8;       /* I2C, GPIO and the DAQ reference */
+  --rig-body: #b4bcc6;        /* the floating body group and its bond lead */
+  --rig-vent-up: #ff9f43;     /* cell vent gas, cells venting up */
+  --rig-vent-dn: #ff7eb6;     /* cell vent gas, cells venting down */
+  --rig-op: var(--accent);    /* operator labels: what to do at the bench */
+  --rig-steel: #8b929c;
+  --rig-fiber: #3a342c;
+  --rig-fiber-dot: #7d6e58;
+  --rig-board: #55555b;       /* cement board under the floor fiber */
+  --rig-mica: #d1a85a;
+  --rig-plenum: rgba(255, 255, 255, .03);
+  --rig-al: #6b727c;          /* body walls and sleeves */
+  --rig-wax: #46412f;
+  --rig-cell: #36363c;
+  --rig-cell-line: rgba(255, 255, 255, .62);
+  --rig-silpad: #9b8f7a;
+  --rig-ring: #c0563f;
+  --rig-busbar: #d4d8de;
+  --rig-part: #1f1f23;
+  --rig-part-line: rgba(255, 255, 255, .55);
+  --rig-region: rgba(255, 255, 255, .035);
+  --rig-region-line: rgba(255, 255, 255, .1);
+  --rig-key: #ffb454;         /* the power switch and heater element */
+  --rig-water: rgba(95, 168, 245, .16);
+  --rig-water-line: rgba(95, 168, 245, .7);
+  --rig-air: #2f2d27;         /* the wax body's air pocket */
+  --rig-silpad2: #b6a98f;     /* second Sil-Pad layer, so the two read apart */
+  --rig-gap: #5fc9c0;         /* gap filler */
+  --rig-nomex: #e0dccb;
+  --rig-stop: #ff8a7a;        /* stop rows in the limits panel */
+  --rig-on: rgba(255, 180, 84, .13);   /* closed, on or plugged in, in the state table */
+  --rig-cu: #c98a5a;          /* Fig 5: the copper layer of the strip */
+  --rig-ni: #d4d8de;          /* Fig 5: the nickel cap (same as the busbars elsewhere) */
+}
+
+/* From a 1440 laptop up, a whole diagram fits the column: smallest text about 8.5 px, and the
+   loop can be followed on one screen. Below that, or zoomed in, it holds a readable size and
+   scrolls inside its box. The page itself never scrolls sideways. */
+.box.rig svg { display: block; width: 100%; height: auto; }
+.box.rig .scroll > svg { min-width: 1150px; }
+.box.rig .scroll > svg.narrow { min-width: 760px; }
+@media (min-width: 1400px) { .box.rig .scroll > svg { min-width: 0; } }
+
+.rig text { fill: var(--text); font-size: 14px; }
+.rig .tag { font-size: 15px; font-weight: 500; }
+.rig .note { fill: var(--dim); font-size: 13px; }
+.rig .op { fill: var(--rig-op); font-size: 13px; }
+.rig .prop { fill: var(--dim); font-size: 13px; font-style: italic; }
+.rig .rgn { fill: var(--dim); font-size: 13px; letter-spacing: .08em; }
+.rig .on-cell { font-size: 15px; font-weight: 500; }
+.rig .small { font-size: 13px; font-weight: 500; }
+.rig .in-part { font-size: 13px; font-weight: 500; }
+.rig .th-tag { fill: var(--rig-th); font-size: 13px; font-weight: 500; }
+.rig tspan.note { font-weight: 400; }        /* a dim detail or designator after a name */
+/* Every part on a figure links to its row in the bill of materials. The link keeps the
+   part's own colors; hover underlines the text and outlines the shape. */
+.rig a.bom { fill: inherit; color: inherit; text-decoration: none; cursor: pointer; }
+.rig a.bom:hover text, .rig a.bom:hover tspan { text-decoration: underline; }
+.rig a.bom:hover .part, .rig a.bom:hover .key, .rig a.bom:hover .chan, .rig a.bom:hover .fuse,
+.rig a.bom:hover .fuse-main, .rig a.bom:hover .disc, .rig a.bom:hover .wood, .rig a.bom:hover .pcb,
+.rig a.bom:hover .holder { stroke: var(--accent); }
+/* ... and the filled shapes in the can (cells, busbars, sleeves, rings, beads, mica, fiber, steel) */
+.rig a.bom:hover .cell, .rig a.bom:hover .cap, .rig a.bom:hover .busbar, .rig a.bom:hover .neck,
+.rig a.bom:hover .sleeve, .rig a.bom:hover .silpad, .rig a.bom:hover .ring, .rig a.bom:hover .bead,
+.rig a.bom:hover .body-al, .rig a.bom:hover .well, .rig a.bom:hover .mica, .rig a.bom:hover .board,
+.rig a.bom:hover .fib, .rig a.bom:hover .steel-fill, .rig a.bom:hover .mesh { stroke: var(--accent); stroke-width: 1.5; }
+.rig a.bom:hover .body { stroke: var(--accent); }
+.rig a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Wires: class "w" plus one net class. Heavy = load current. */
+.rig .w { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.rig .n-pos   { stroke: var(--rig-pos); stroke-width: 5; }
+.rig .n-neg   { stroke: var(--rig-neg); stroke-width: 5; stroke-dasharray: 18 4; stroke-linecap: butt; }
+.rig .n-tap   { stroke: var(--rig-tap); stroke-width: 2; }
+.rig .n-sense { stroke: var(--rig-tap); stroke-width: 1.5; stroke-dasharray: 6 3; stroke-linecap: butt; }
+.rig .n-th    { stroke: var(--rig-th); stroke-width: 1.75; stroke-dasharray: 8 3; stroke-linecap: butt; }
+.rig .n-ctl   { stroke: var(--rig-ctl); stroke-width: 2; stroke-dasharray: 12 3 2 3; stroke-linecap: butt; }
+.rig .n-logic { stroke: var(--rig-logic); stroke-width: 1.75; stroke-dasharray: 3 3; stroke-linecap: butt; }
+.rig .n-body  { stroke: var(--rig-body); stroke-width: 2.5; stroke-dasharray: 1 4; }
+.rig .chg     { stroke-width: 3; }                      /* charger main leads, 10 AWG but not load */
+.rig .run1    { stroke-dasharray: 7 6; stroke-linecap: butt; }   /* run #1 only */
+.rig .lk      { fill: none; }                           /* legend line samples */
+/* A line drawn under a crossing wire's casing reads as passing under it. */
+.rig .case { fill: none; stroke: var(--rig-bg); stroke-width: 11; }
+
+.rig .bg { fill: var(--rig-bg); }
+.rig .rg { fill: var(--rig-region); stroke: var(--rig-region-line); stroke-width: 1; }
+.rig .part { fill: var(--rig-part); stroke: var(--rig-part-line); stroke-width: 1.25; }
+.rig .part.prop, .rig .outline.prop { stroke-dasharray: 5 3; }
+.rig .term { fill: var(--text); }
+.rig .jn { fill: var(--text); }
+.rig .term-open { fill: var(--rig-bg); stroke: var(--text); stroke-width: 1.5; }
+.rig .lead { fill: none; stroke: var(--rig-part-line); stroke-width: 1.25; }
+
+.rig .steel { fill: none; stroke: var(--rig-steel); stroke-width: 5; }
+.rig .steel-fill { fill: var(--rig-steel); }
+.rig .fiber { fill: var(--rig-fiber); }
+.rig .fiber-dot { fill: var(--rig-fiber-dot); }
+.rig .board { fill: var(--rig-board); }
+.rig .mica { fill: var(--rig-mica); }
+.rig .plenum { fill: var(--rig-plenum); }
+.rig .mesh { fill: none; stroke: var(--rig-steel); stroke-width: 2; stroke-dasharray: 2 2; }
+.rig .body { fill: var(--rig-wax); stroke: var(--rig-al); stroke-width: 4; }
+.rig .body-al { fill: var(--rig-al); }
+.rig .body-mark { fill: none; stroke: var(--rig-body); stroke-width: 1.5; }
+.rig .sleeve { fill: var(--rig-al); }
+.rig .cell { fill: var(--rig-cell); stroke: var(--rig-cell-line); stroke-width: 1.25; }
+.rig .cap { fill: var(--rig-cell-line); }
+.rig .silpad { fill: var(--rig-silpad); }
+.rig .ring { fill: var(--rig-ring); }
+.rig .busbar, .rig .neck { fill: var(--rig-busbar); }
+.rig .fuse { fill: var(--rig-part); stroke: var(--rig-tap); stroke-width: 1.5; }
+.rig .fuse-main { fill: var(--rig-part); stroke: var(--rig-pos); stroke-width: 2; }
+.rig .fuse-el { fill: none; stroke: var(--rig-part-line); stroke-width: 1.25; }
+.rig .holder { fill: none; stroke: var(--rig-part-line); stroke-width: 1; stroke-dasharray: 2 2; }   /* inline fuse holder */
+.rig .bead { fill: var(--rig-th); }
+.rig .well { fill: var(--rig-part); stroke: var(--rig-al); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.rig .vent-up { fill: none; stroke: var(--rig-vent-up); stroke-width: 3; }
+.rig .vent-dn { fill: none; stroke: var(--rig-vent-dn); stroke-width: 3; }
+.rig .vent-up-head { fill: var(--rig-vent-up); }
+.rig .vent-dn-head { fill: var(--rig-vent-dn); }
+.rig .flow-pos { fill: var(--rig-pos); }
+.rig .flow-neg { fill: var(--rig-neg); }
+/* The two parts Trevor named: the power switch and the heater element stand out. */
+.rig .key { fill: var(--rig-part); stroke: var(--rig-key); stroke-width: 3.5; }
+.rig .key-tag { fill: var(--rig-key); font-size: 22px; font-weight: 500; }
+.rig .sw-blade { fill: none; stroke: var(--rig-key); stroke-width: 3.5; stroke-linecap: round; }
+.rig .sw-pt { fill: var(--rig-key); }
+.rig .hot { fill: none; stroke: var(--rig-key); stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; }
+.rig .hot.run1 { stroke: var(--rig-part-line); stroke-width: 2.5; stroke-dasharray: 7 6; stroke-linecap: butt; }
+.rig .part.run1 { stroke-dasharray: 7 6; }
+.rig .water { fill: var(--rig-water); }
+.rig .water-line { fill: none; stroke: var(--rig-water-line); stroke-width: 1.5; }
+.rig .pail { fill: none; stroke: var(--rig-steel); stroke-width: 3; }
+.rig .wood { fill: var(--rig-board); }
+.rig .disc { fill: var(--rig-part); stroke: var(--rig-ctl); stroke-width: 1.5; }
+.rig .sym { fill: none; stroke: var(--rig-part-line); stroke-width: 1.5; }
+.rig .sym-ctl { fill: none; stroke: var(--rig-ctl); stroke-width: 1.75; }
+.rig .sym-ctl-fill { fill: var(--rig-ctl); }
+.rig .slash { fill: none; stroke: var(--rig-tap); stroke-width: 1.5; }
+.rig .case-thin { fill: none; stroke: var(--rig-bg); stroke-width: 6; }
+.rig .case-row { fill: none; stroke: var(--rig-bg); stroke-width: 4.5; }   /* a row over the lanes it crosses */
+.rig .pcb { fill: var(--rig-region); stroke: var(--rig-part-line); stroke-width: 1; }   /* DIV's outline */
+.rig .pcb.prop { stroke-dasharray: 5 3; }
+.rig .chan { fill: var(--rig-part); }                      /* one channel on DIV */
+/* Fig 2: the section, the top view and the wall stack */
+.rig .wax { fill: var(--rig-wax); }
+.rig .air { fill: var(--rig-air); }
+.rig .silpad2 { fill: var(--rig-silpad2); }
+.rig .gapfill { fill: var(--rig-gap); }
+.rig .nomex { fill: var(--rig-nomex); }
+.rig .film { fill: var(--rig-th); opacity: .75; }
+.rig .ldr { fill: none; stroke: var(--dim); stroke-width: 1; }
+.rig .ldr-dot { fill: var(--dim); }
+.rig .dim { fill: none; stroke: var(--dim); stroke-width: 1; }
+.rig .scale { fill: none; stroke: var(--text); stroke-width: 3; }
+.rig .ear { fill: none; stroke: var(--rig-al); stroke-linecap: round; }
+.rig .hole { fill: var(--rig-bg); stroke: var(--rig-part-line); stroke-width: 1.25; }
+.rig .keepout { fill: none; stroke: var(--rig-pos); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.rig .bar-top { fill: none; stroke: var(--rig-busbar); stroke-width: 11; stroke-linecap: round; }
+.rig .bar-bot { fill: none; stroke: var(--rig-busbar); stroke-width: 7; stroke-dasharray: 11 6; stroke-linecap: butt; }
+.rig .pill { fill: var(--rig-part); stroke: var(--rig-busbar); stroke-width: 1.25; }
+.rig .series { fill: var(--rig-part-line); }
+.rig .sym-up { fill: none; stroke: var(--rig-vent-up); stroke-width: 2.25; }
+.rig .sym-up-dot { fill: var(--rig-vent-up); }
+.rig .sym-dn { fill: none; stroke: var(--rig-vent-dn); stroke-width: 2.25; }
+/* Fig 5: the busbar strip drawing */
+.rig .cu { fill: var(--rig-cu); stroke: var(--rig-part-line); stroke-width: 1; }
+.rig .ni { fill: var(--rig-ni); stroke: var(--rig-part-line); stroke-width: 1; }
+.rig .slit { fill: var(--rig-bg); stroke: var(--rig-part-line); stroke-width: 1; }
+.rig .tip { fill: var(--rig-key); }
+.rig .nugget { fill: var(--rig-pos); opacity: .6; }
+.rig .dim-head { fill: var(--dim); }
+.rig a.bom:hover .cu, .rig a.bom:hover .ni { stroke: var(--accent); stroke-width: 1.5; }
+
+/* The bench tables under the figures. Red = stop; a shaded cell = closed, on or plugged in. */
+.rig-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 16px 32px; align-items: start; }
+.rig-panel > div > table + table { margin-top: 16px; }
+.box.rig table { font-size: .86em; line-height: 1.35; }
+.box.rig th, .box.rig td { padding: .3em .55em; vertical-align: top; }
+.box.rig caption { text-align: left; font-weight: 500; padding: 0 .55em .35em; }
+.box.rig thead th { color: var(--dim); font-weight: 400; }
+.box.rig tr.grp th { padding-top: .9em; font-weight: 500; color: var(--accent); border-bottom: 1px solid var(--line); }
+.box.rig .states, .box.rig .channels, .box.rig .matrix { min-width: 760px; }
+.box.rig .scroll td:first-child { white-space: normal; }
+.box.rig .states td, .box.rig .states th { text-align: center; white-space: nowrap; }
+.box.rig .states td:first-child, .box.rig .states th:first-child { text-align: left; font-weight: 500; }
+.box.rig .states td.on { background: var(--rig-on); font-weight: 500; }
+.rig .lim { color: var(--rig-stop); font-weight: 500; }
+.rig em.prop { color: var(--dim); font-style: italic; }
+.rig .tnotes { margin: 12px .55em 0; padding: 0; list-style: none; font-size: .86em; line-height: 1.45; color: var(--dim); }
+.rig .tnotes li + li { margin-top: 4px; }
+.rig .tnotes b { font-weight: 500; color: var(--text); }
+.box.rig .flag { margin: 0 0 14px; padding: 10px 14px; border-left: 3px solid var(--rig-key); background: var(--rig-on); }
+.box.rig .flag p { margin: 0 0 8px; font-size: .92em; line-height: 1.45; }
+.box.rig .flag table { margin-top: 4px; }
+.rig-open { padding-left: 1.6em; }
+.rig-open li + li { margin-top: .25em; }
+.rig-open b { font-weight: 500; }
+/* Bill of materials: the table's job is "what is still missing", so Buy and Decide stand out. */
+.box.rig .bom-table { min-width: 980px; }
+.box.rig .bom-table td:first-child { white-space: nowrap; }
+.box.rig .bom-table td:first-child a { color: var(--accent); text-decoration: none; }
+.box.rig .bom-table td:first-child a:hover { text-decoration: underline; }
+.box.rig .bom-table td:nth-child(2) { font-weight: 500; white-space: nowrap; }
+.box.rig .bom-table td:nth-child(5), .box.rig .bom-table td:nth-child(6) { white-space: nowrap; }
+.box.rig .bom-table .bom-note { color: var(--dim); }
+.box.rig .bom-table .st-buy { color: var(--rig-stop); font-weight: 500; }
+.box.rig .bom-table .st-decide { color: var(--rig-key); font-weight: 500; }
+.box.rig .bom-table .st-proposed { color: var(--dim); font-style: italic; }
+.box.rig .bom-table tr:target { background: var(--rig-on); }
+.box.rig .bom-table tr:target td { border-bottom-color: var(--rig-key); }
+.box.rig #bom figcaption b { font-weight: 500; color: var(--text); }
+
+@media print {
+  .rig {
+    --rig-bg: #fff;
+    --rig-pos: #c0392b;
+    --rig-neg: #1f5fa8;
+    --rig-tap: #9a7b00;
+    --rig-th: #1e8a5a;
+    --rig-ctl: #7b3fb0;
+    --rig-logic: #127f86;
+    --rig-body: #555b63;
+    --rig-vent-up: #c76a00;
+    --rig-vent-dn: #c2387a;
+    --rig-op: #000;
+    --rig-steel: #555b63;
+    --rig-fiber: #f1ece4;
+    --rig-fiber-dot: #b9ab95;
+    --rig-board: #cfcfd3;
+    --rig-mica: #b8892e;
+    --rig-plenum: transparent;
+    --rig-al: #9aa1aa;
+    --rig-wax: #efe8d2;
+    --rig-cell: #e9e9ec;
+    --rig-cell-line: #222;
+    --rig-silpad: #b8ab92;
+    --rig-ring: #b04a33;
+    --rig-busbar: #6b7079;
+    --rig-part: #fff;
+    --rig-part-line: #333;
+    --rig-region: #f6f6f7;
+    --rig-region-line: #ccc;
+    --rig-key: #b35900;
+    --rig-water: #e3eefb;
+    --rig-water-line: #1f5fa8;
+    --rig-air: #fbf9f1;
+    --rig-silpad2: #d6cdb8;
+    --rig-gap: #2f9c92;
+    --rig-nomex: #777;
+    --rig-stop: #b3261e;
+    --rig-on: #f3ead7;
+    --rig-cu: #c98a5a;
+    --rig-ni: #9aa1aa;
+  }
+  .rig .op { font-weight: 500; }
+  .box.rig .scroll > svg, .box.rig .scroll > svg.narrow { min-width: 0; }
+  .box.rig .bom-table { min-width: 0; }
+  .box.rig .bom-table .st-buy, .box.rig .bom-table .st-decide { text-decoration: underline; }
+  .box.rig .bom-table tr:target { background: none; }
+}
