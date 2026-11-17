@@ -7,7 +7,7 @@ const PAGES = [
   // Every other page is a folder's index.html, served at '/folder/'.
   { href: '/',                          title: 'Home',                     model: '/shared/models/head-tube-lug.glb' },
   { href: '/lattice-structures/',       title: 'Lattice Structures',       model: '/lattice-structures/models/bcc-lattice.glb' },
-  { href: '/fishing/',                  title: 'Fishing',                  model: '/fishing/taiyaki_bowl.glb' },
+  { href: '/fishing/',                  title: 'Fishing',                  model: '/fishing/models/taiyaki-bowl.glb' },
   { href: '/longshore-casual/',         title: 'Longshore Casual',         model: '/shared/models/head-tube-lug.glb' },
 ];
 
