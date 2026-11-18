@@ -37,16 +37,15 @@
 
         <h2>Casual work against cargo</h2>
         <p>
-          Total longshore jobs strongly track cargo (r = 0.87); casual jobs moderately do (r = 0.59), 
-          and month to month barely at all (r = 0.25)." In other words, a sudden monthly increase in 
-          cargo is not a predictor of similar increases in casual jobs, as casual jobs only follow the 
-          long run trend of cargo.
+          Total longshore jobs strongly track monthly cargo (r = 0.87); casual jobs moderately do (r = 0.59), 
+          and month to month barely at all (r = 0.25)." Casual jobs only follow long run cargo trends.
         </p>
 
         <figure class="box">
           <div class="chart" data-chart="casual-teu" tabindex="0" role="img"
                aria-label="Line chart of casual jobs, total longshore jobs and LA plus Long Beach TEUs by month, January 2022 to January 2027, each indexed to September 2026 equals 100. Casual jobs start near 125, fall to almost nothing from late 2022 to mid 2024, come back in bursts and reach 100 in September 2026, while total jobs and TEUs move together between about 50 and 105. Arrow keys read each month."></div>
-          <figcaption>Fig 1. Compares monthly Casual Jobs, Total Longshore Jobs, and LA/LB TEU (Twenty-foot shipping container) with a forecast to Jan 2027. Note hollow points indicate log errors with some days missing data points.</figcaption>
+          <figcaption>Fig 1. Compares monthly Casual Jobs, Total Longshore Jobs, and LA/LB TEU (Twenty-foot shipping container) with a 
+            forecast to Jan 2027.</figcaption>
         </figure>
         <figure class="box">
           <div class="chart-pair">
@@ -55,28 +54,23 @@
             <div class="chart" data-chart="jobs-teu-casual" tabindex="0" role="img"
                  aria-label="Scatter plot of casual jobs against LA plus Long Beach TEUs in millions, one point per complete month from February 2022 to September 2026, with a least-squares line. Casual jobs scatter widely at every cargo level. Arrow keys read each month."></div>
           </div>
-          <figcaption>Fig 2. Casual Jobs and Total Longshore Jobs vs monthly LA/LB TEU, with least-squares fit regression lines. SE is each line's standard error of the estimate, in jobs.</figcaption>
+          <figcaption>Fig 2. Casual Jobs and Total Longshore Jobs vs monthly LA/LB TEU, with least-squares fit regression lines.</figcaption>
         </figure>
 
         <h2>Letters moved</h2>
         <p>
-          The casual hall dispatches ordered by letters, and in slower months, the hall
-          tends to move a letter for less than busier months, when more casuals come to the hall
-          looking for work.
+          The casual hall dispatches jobs by letters, and in slower months letters advanced for less jobs than in busier months
+          due to less casuals seeking work.
         </p>
         <figure class="box">
           <div class="chart" data-chart="letters" tabindex="0" role="img"
                aria-label="Bar chart of letters the casual hall moved each month, January 2022 to January 2027. Early 2022 is highest, peaking at 903 in February; every month from September 2022 to June 2026 moves under 330, and September and October 2026 move over 570 each. The forecast is in Table 3. Arrow keys read each month."></div>
-          <figcaption>Fig 3. Letters the casual hall moved each month, the sum of each shift's actual movement. October 2026 stacks the estimate for the rest of the month on the 574 letters dispatched so far. The faded bars are the forecast, with low-to-high ranges. Hollow points are months where log errors left some days without data.</figcaption>
+          <figcaption>Fig 3. Letters moved per month with prediction to January 2027.</figcaption>
         </figure>
         <p>
           In the last 16 months with R<sup>2</sup>&nbsp;=&nbsp;0.99 and an
           error of 0.27 letters per working shift, the hall operated at 33 jobs per letter.
         </p>
-        <figure class="box">
-          <div class="scroll"><table data-table="regimes"></table></div>
-          <figcaption>Table 1. The five stretches the letters relationship splits into. Jobs are casual jobs per working shift: shifts under 450 total jobs (holidays, stop-work meetings, storms) are left out. Jobs per letter is one over the slope; in the first stretch it counts only the jobs above the threshold.</figcaption>
-        </figure>
 
         <h2>Casual share and jobs per TEU</h2>
         <p>
@@ -86,18 +80,19 @@
         </p>
         <figure class="box">
           <div class="chart-pair">
-            <div>
+            <figure>
               <div class="chart-title">Casual share of total jobs, %</div>
               <div class="chart" data-chart="share" tabindex="0" role="img"
                    aria-label="Line chart of casual jobs as a share of total jobs by month, January 2022 to January 2027. It falls from 19% in early 2022 to under 2% from September 2022 to July 2024, comes back in bursts and reaches 14% in September 2026. Arrow keys read each month."></div>
-            </div>
-            <div>
+              <figcaption>Fig 4a. Casual jobs vs. total longshore jobs.</figcaption>
+            </figure>
+            <figure>
               <div class="chart-title">Total jobs per 1,000 TEU</div>
               <div class="chart" data-chart="ratio" tabindex="0" role="img"
-                   aria-label="Line chart of total jobs per 1,000 LA plus Long Beach TEU by month, February 2022 to September 2026, sliding from between 73 and 81 in 2022 to between 63 and 69 in 2026, with a separate point for October 2026 at 83. Arrow keys read each month."></div>
-            </div>
+                   aria-label="Line chart of total jobs per 1,000 LA plus Long Beach TEU by month, February 2022 to September 2026, sliding from between 73 and 81 in 2022 to between 63 and 69 in 2026. Arrow keys read each month."></div>
+              <figcaption>Fig 4b. Total longshore jobs required to output 1000 TEU.</figcaption>
+            </figure>
           </div>
-          <figcaption>Fig 4. Left, casual jobs as a share of all jobs dispatched; the forecast is this autumn's share plus the median winter rise, &plusmn;2 points. Right, total jobs per 1,000 LA + Long Beach TEU, with no ratio for the partial months of January and December 2022; the forecast holds the October 2025 to September 2026 mean of 66.2. The hollow point is October 2026's projected jobs over its 1.76 million TEU guidance: 83, above the record of 81 set in August 2022.</figcaption>
         </figure>
         <p>
           Searching for a long run trend, PMA's annual reports go back further, in hours paid rather than
@@ -108,7 +103,9 @@
           <div class="chart-title">Longshore hours per TEU</div>
           <div class="chart" data-chart="years" tabindex="0" role="img"
                aria-label="Line chart of longshore hours paid per LA plus Long Beach TEU by year, 2008 to 2023: 0.96 in 2008, between 0.91 and 0.95 through 2013, a peak of 1.05 in 2014 and 2015, then down to 0.90 in 2020 and 0.88 in 2023. A dotted least-squares line falls from 0.97 to 0.93, 0.0025 hours per TEU a year. A shaded band covers July 2014 to May 2015, from the expiry of the 2008 contract to the ratification of the next. 2024 to 2026 are blank, not yet published. Arrow keys read each year."></div>
-          <figcaption>Fig 5. Longshore hours paid per LA + Long Beach TEU by year: PMA's hours paid at the two ports times their longshore share, over the ports' calendar-year TEUs. Clerk and foreman hours are left out. The dotted line is the least-squares fit through 2008&ndash;2023. PMA hasn't yet published its 2024 or later annual reports. Shaded areas indicate strike and incomplete contract.</figcaption>
+          <figcaption>Fig 5. Longshore efficiency. The dotted line is the 
+            least-squares fit through 2008&ndash;2023. 2024 and later data from PMA not provided. Shaded areas 
+            indicate strike and incomplete contract.</figcaption>
         </figure>
         <p>
           The 2014&ndash;15 peak was caused by the contract fight: PMA
@@ -147,7 +144,7 @@
           <div class="chart-title">Registered workers checked in, 1st shift</div>
           <div class="chart" data-chart="checkin" tabindex="0" role="img"
                aria-label="Line chart of Class A and Class B workers checked in at the longshore hall for each day's 1st shift, October 26, 2024 to October 25, 2026. Class A averages 1,015 and Class B 512, with little change between the two years. Arrow keys read each day."></div>
-          <figcaption>Fig 6. Class A and Class B registered workers checked in at the LA/LB longshore hall for each day's 1st shift, from PMA's dispatch summaries. Four days are blank where PMA posted the summary before dispatch finished. August 15, 2025 is plotted as published: 519 Class A and 982 Class B, each far from its usual level.</figcaption>
+          <figcaption>Fig 6. Long run check-in status is stable for class A and B workers.</figcaption>
         </figure>
 
         <h2>References</h2>

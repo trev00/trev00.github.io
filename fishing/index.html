@@ -29,30 +29,38 @@
       <!-- A dashboard, not a report: the map is the one hero, with the totals
            above it, and the trips are a feed of cards beside it on a wide
            screen (styles.css, .dash). Hovering a card lights that trip's spots
-           on the map; clicking it flies the map there. -->
+           on the map. -->
       <article class="fishing">
-        <!-- The cover, from tools/prep_photos.py --cover, as a slim band behind
-             the title. object-position keeps the sun in frame as the banner
-             crops; if the files are missing the image removes itself and the
-             title shows plain. -->
-        <header class="cover slim">
-          <img src="/fishing/images/cover-1600.jpg"
-               srcset="/fishing/images/cover-960.jpg 960w, /fishing/images/cover-1600.jpg 1600w, /fishing/images/cover-3200.jpg 3200w"
-               sizes="(max-width: 800px) 100vw, 1400px" alt="The sun setting on the horizon over the water"
-               fetchpriority="high" style="object-position: 50% 58%" onerror="this.remove()">
-          <h1>Fishing</h1>
-        </header>
+        <!-- On a wide screen the cover, totals and map hold still while the
+             page scrolls, and the scroll moves the trips instead; once the
+             last trip is in view the page carries on down (styles.css, .pin;
+             fishing.js, pinTrips). Anywhere else these two are plain blocks. -->
+        <div class="pin-track" id="pin-track">
+          <div class="pin">
+            <!-- The cover, from tools/prep_photos.py --cover, as a slim band
+                 behind the title. object-position keeps the horizon in frame as
+                 the banner crops; if the files are missing the image removes
+                 itself and the title shows plain. -->
+            <header class="cover slim">
+              <img src="/fishing/images/cover-1600.jpg"
+                   srcset="/fishing/images/cover-960.jpg 960w, /fishing/images/cover-1600.jpg 1600w, /fishing/images/cover-3200.jpg 3200w"
+                   sizes="(max-width: 800px) 100vw, 1400px" alt="The sun setting on the horizon over the water"
+                   fetchpriority="high" style="object-position: 50% 58%" onerror="this.remove()">
+              <h1>Fishing</h1>
+            </header>
 
-        <div class="dash">
-          <div class="map-col">
-            <div class="stats" id="stats" role="list" aria-label="Totals"></div>
-            <div class="fishmap" id="fish-map" role="region" aria-label="Map of logged fishing spots"></div>
+            <div class="dash">
+              <div class="map-col">
+                <div class="stats" id="stats" role="list" aria-label="Totals"></div>
+                <div class="fishmap" id="fish-map" role="region" aria-label="Map of logged fishing spots"></div>
+              </div>
+
+              <section class="trips-col" id="trips-col">
+                <h2>Trips</h2>
+                <div id="trips"></div>
+              </section>
+            </div>
           </div>
-
-          <section class="trips-col">
-            <h2>Trips</h2>
-            <div id="trips"></div>
-          </section>
         </div>
 
         <!-- The viewer: one photo at a time, with the arrows and the arrow
@@ -82,13 +90,6 @@
               a closed season; a count after a name is how many of that species this log has caught.
               Hover a cell for details.</figcaption>
           </figure>
-        </section>
-
-        <!-- Every trip's photos, newest first, as a row of squares. The last
-             square counts the rest; any of them opens the viewer. -->
-        <section class="gallery-sec" id="gallery-sec" hidden>
-          <h2>Photos</h2>
-          <div class="gallery" id="gallery"></div>
         </section>
 
       </article>

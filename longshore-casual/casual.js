@@ -6,7 +6,7 @@
 // there on each value is a base case with a low-high range, drawn dashed over a
 // shaded band. Fig 5 runs on its own year axis, back to 2008, and Fig 6 on a day axis.
 
-import { MONTHS, FORECAST, REGIMES, RATIO, SEASONS, SHARE, OCTOBER, CORR, YEARS, TREND, CHECKIN } from '/longshore-casual/casual-data.js';
+import { MONTHS, FORECAST, REGIMES, RATIO, SEASONS, SHARE, CORR, YEARS, TREND, CHECKIN } from '/longshore-casual/casual-data.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const ACTUAL = new Map(MONTHS.map((r) => [r.m, r]));
@@ -141,13 +141,13 @@ const CHARTS = {
   },
   ratio: {
     // On the share panel's axis; partial months have no ratio, so the line breaks there.
+    // Nor does the month still being dispatched: its total is the jobs dispatched so far
+    // plus an estimate for the rest, not its TEUs times the ratio.
     kind: 'line', from: 0, height: 220, step: 5,
     series: [{
-      ...lineSeries('Total jobs per 1,000 TEU', 'assumed', 'c2', (r) => r.jpt, () => RATIO.mean),
+      ...lineSeries('Total jobs per 1,000 TEU', 'assumed', 'c2', (r) => r.jpt, (f) => (f.toDate ? null : RATIO.mean)),
       joinActual: false,
     }],
-    // October's dispatch against its TEU guidance: the point the forecast can't reconcile.
-    point: { i: START, v: OCTOBER.impliedRatio.base },
     end: (v) => v.toFixed(1),
     tip(i) {
       const k = KEYS[i];
@@ -157,10 +157,7 @@ const CHARTS = {
           r.jpt == null ? `partial month, no ratio (${r.partial})` : `${fmt(r.total)} jobs ÷ ${fmt(r.teu)} TEU`]]];
       }
       const f = FC.get(k);
-      if (i === START) {
-        return [forecastHeading(k), [['c2', OCTOBER.impliedRatio.base.toFixed(1),
-          `${fmt(f.base.total)} jobs ÷ ${mteu(f.base.teu)} TEU guidance`]]];
-      }
+      if (f.toDate) return [forecastHeading(k), [['c2', '—', 'no ratio assumed for a month under way']]];
       return [forecastHeading(k), [['c2', RATIO.mean.toFixed(1),
         `assumed, the ${monthName(RATIO.from)}–${monthName(RATIO.to)} mean`]]];
     },
@@ -272,7 +269,6 @@ function extent(cfg) {
     for (const s of cfg.series) {
       vals.push(...s.vals.slice(cfg.from), ...CASES.flatMap((c) => s.fc[c]));
     }
-    if (cfg.point) vals.push(cfg.point.v);
   }
   vals = vals.filter((v) => v != null);
   return [Math.floor(Math.min(...vals) / cfg.step) * cfg.step, Math.ceil(Math.max(...vals) / cfg.step) * cfg.step];
@@ -345,7 +341,7 @@ function drawLines(root, tip, cfg) {
     const fcPts = [];
     for (let i = seam; i <= last; i++) {
       const v = from(i) ?? s.fc.base[i];
-      if (v != null && !(cfg.point && i === cfg.point.i)) fcPts.push([x(i), y(v)]);
+      if (v != null) fcPts.push([x(i), y(v)]);
     }
     if (fcPts.length > 1) svgEl('path', { class: 'fc', d: pathOf(fcPts) }, g);
 
@@ -358,14 +354,6 @@ function drawLines(root, tip, cfg) {
     svgEl('tspan', { class: 'value' }, label).textContent = cfg.end(s.fc.base[last]);
     if (!narrow) svgEl('tspan', { dx: 6 }, label).textContent = s.short;
   });
-
-  if (cfg.point) {
-    const g = svgEl('g', { class: `series ${cfg.series[0].cls}` }, svg);
-    const px = x(cfg.point.i), py = y(cfg.point.v);
-    svgEl('circle', { class: 'partial', cx: px, cy: py, r: 4 }, g);
-    svgEl('text', { x: px - 8, y: py, 'text-anchor': 'end', 'dominant-baseline': 'middle' }, svg)
-      .textContent = `${monthName(KEYS[cfg.point.i]).slice(0, 3)}: ${cfg.point.v.toFixed(0)}`;
-  }
 
   const hair = svgEl('line', { class: 'crosshair', y1: m.top, y2: H - m.bottom, visibility: 'hidden' }, svg);
   svgEl('rect', { x: 0, y: 0, width: W, height: H, fill: 'transparent' }, svg);

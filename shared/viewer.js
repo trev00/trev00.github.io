@@ -31,6 +31,11 @@ export function createViewer(el, url, { lock = false } = {}) {
   controls.enableZoom = !lock;
   controls.enablePan = !lock;
   controls.zoomToCursor = !lock;   // wheel zooms toward the pointer
+  // OrbitControls takes every touch on its canvas (touch-action: none). The
+  // sidebar model gives the up-and-down ones back: a finger moving up or down
+  // over it scrolls the page, and a sideways drag spins it. Body models keep
+  // every gesture, since they need the pinch to zoom.
+  if (lock) renderer.domElement.style.touchAction = 'pan-y';
 
   // The x PI carries the scaling three applied internally up to r154, which
   // keeps the base numbers legible. Raised from the original 18 / 2 because

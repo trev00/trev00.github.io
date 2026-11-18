@@ -223,7 +223,7 @@ function drawMap(el) {
     return;
   }
   // Leaflet's own credit is off: its BSD license asks for nothing on the map,
-  // and the Esri credit is drawn under the map instead (below). No +/- buttons.
+  // and the Esri credit is its own control (below). No +/- buttons.
   // A mouse zooms the map as soon as it's over it. On a touch screen the map
   // ignores fingers until it's tapped, so a swipe past it scrolls the page.
   const touch = matchMedia('(pointer: coarse)').matches;
@@ -264,9 +264,13 @@ function drawMap(el) {
     },
   };
 
-  // Esri requires "Powered by Esri" plus every data source's name "directly on
-  // or at the bottom of the map where it is always visible", at 12px or
-  // larger. It sits in the map's bottom-left corner, over the open water.
+  // Esri requires "Powered by Esri" plus every data source's name clearly
+  // displayed on the map, where nothing covers it; 12px or larger and readable
+  // colors are its recommendations. It sits in the map's bottom-left corner as
+  // plain gray text, with no box: styles.css picks light or dark gray for the
+  // basemap showing (.on-ocean, set in show below) and halos it so it reads
+  // over land as well as water. Esri's own suggested look is dark text on a
+  // translucent white box; if the text ever stops being readable, go to that.
   let credit;
   const creditControl = L.control({ position: 'bottomleft' });
   creditControl.onAdd = () => {
@@ -315,6 +319,7 @@ function drawMap(el) {
     if (ocean) zones.addTo(map);
     else zones.remove();
     legend.hidden = !ocean;
+    el.classList.toggle('on-ocean', ocean);
     // CDFW's data is CC BY 4.0, so it's credited whenever it's on the map.
     credit.innerHTML = `Powered by <a href="https://www.esri.com">Esri</a> · Sources: ${BASEMAPS[name].sources}`
       + (ocean ? ' · Protected areas: <a href="https://wildlife.ca.gov/Data/BIOS">CDFW</a>, CC BY 4.0. Not for navigation; check current regulations before fishing.' : '');
@@ -430,6 +435,10 @@ function drawMap(el) {
   for (const c of catches) view.extend(c.ll);
   map.fitBounds(view);
   if (el.clientWidth >= 600 && map.getZoom() < 10) map.setView(view.getCenter(), 10);
+  // Leaflet only rereads its size when the window resizes. The map also
+  // changes height when the legend under it comes and goes, and when the
+  // pinned layout stretches it to the window, so watch the box itself.
+  new ResizeObserver(() => map.invalidateSize(false)).observe(el);
 
   // Focus on one trip: the map's glow and lines dim (styles.css, .fishmap.focus)
   // and the trip's own points are drawn again on top, a touch wider, at full
@@ -507,8 +516,56 @@ function drawTrips(el, mapApi) {
   el.addEventListener('focusout', (e) => { if (!el.contains(e.relatedTarget)) dark(); });
 }
 
-// Every trip's photos, newest trip first. The log rows and the gallery link
-// into this one list, so the viewer can step through all of them.
+// On a wide screen the cover, totals and map are pinned (styles.css, .pin) and
+// the trips column can't be scrolled by hand: the page's own scroll drives it.
+// The track that holds the pin is as tall as the pin plus the trips' hidden
+// height, so the page scrolls that far with nothing appearing to move but the
+// trips; then the pin lets go and the rest of the page comes up. Since it is
+// the page that scrolls, the wheel, keys, scrollbar and touch all work, in
+// both directions.
+function pinTrips(track, col, list) {
+  const pinned = matchMedia('(min-width: 1400px) and (min-height: 640px)');
+  const pin = track.firstElementChild;
+  let start = 0;   // the page scroll at which the pin takes hold
+  let extra = 0;   // how far the trips have to scroll
+  let set = 0;     // the scroll position last given to the trips
+  const sync = () => {
+    if (!pinned.matches) return;
+    const to = Math.min(Math.max(window.scrollY - start, 0), extra);
+    col.scrollTop = to;
+    // Read it back: the browser rounds and clamps what it's given, and the
+    // listener below must compare against what the column really holds.
+    set = col.scrollTop;
+    // The column fades out at its foot until the last trip is in view.
+    col.classList.toggle('at-end', to >= extra - 1);
+  };
+  const measure = () => {
+    if (!pinned.matches) {
+      track.style.removeProperty('--trips-extra');
+      col.classList.remove('at-end');
+      return;
+    }
+    extra = Math.max(0, col.scrollHeight - col.clientHeight);
+    track.style.setProperty('--trips-extra', `${extra}px`);
+    start = track.getBoundingClientRect().top + window.scrollY - parseFloat(getComputedStyle(pin).top);
+    sync();
+  };
+  window.addEventListener('scroll', sync, { passive: true });
+  // Tabbing to a card, or find-in-page, scrolls the column itself to show it.
+  // Move the page to match, so the two never disagree.
+  col.addEventListener('scroll', () => {
+    if (!pinned.matches || Math.abs(col.scrollTop - set) < 1) return;
+    window.scrollTo(0, start + col.scrollTop);
+  });
+  const sized = new ResizeObserver(measure);
+  sized.observe(col);
+  sized.observe(list);
+  pinned.addEventListener('change', measure);
+  measure();
+}
+
+// Every trip's photos, newest trip first. The trip cards link into this one
+// list, so the viewer can step through all of them.
 const photos = trips.flatMap((t) => (t.photos ?? []).map((p) => ({ ...p, trip: t })));
 const IMAGES = '/fishing/images';
 const alt = (p) => p.caption || `Photo from ${fmtDate(p.trip.date)}`;
@@ -519,19 +576,6 @@ function thumb(p) {
   const s = 480 / Math.max(p.w, p.h);
   return `<a href="${IMAGES}/${esc(p.src)}" data-photo="${i}"><img src="${IMAGES}/thumbs/${esc(p.src)}"`
     + ` width="${Math.round(p.w * s)}" height="${Math.round(p.h * s)}" alt="${esc(alt(p))}" loading="lazy"></a>`;
-}
-
-// The gallery at the foot of the page: the newest photos as a row of squares,
-// the last one counting the rest. Any of them opens the viewer, which steps
-// through every photo.
-const GALLERY = 6;
-function drawGallery(section, el) {
-  if (!photos.length) return;
-  section.hidden = false;
-  const shown = photos.slice(0, GALLERY);
-  const rest = photos.length - shown.length;
-  el.innerHTML = shown.map((p, i) => `
-    <figure${rest && i === shown.length - 1 ? ' class="more"' : ''}>${thumb(p)}${rest && i === shown.length - 1 ? `<span aria-hidden="true">+${rest} more</span>` : ''}</figure>`).join('');
 }
 
 // One <dialog> shows the full photo for any thumbnail on the page. The arrow
@@ -619,9 +663,10 @@ function drawSeasons(table, tip) {
 
 // Without Leaflet the map shows its failure note and the cards just don't light it.
 const noMap = { focus() {}, blur() {} };
-const mapApi = drawMap(document.getElementById('fish-map')) ?? noMap;
+// The totals go in first: they sit above the map and set how tall it is.
 drawStats(document.getElementById('stats'));
+const mapApi = drawMap(document.getElementById('fish-map')) ?? noMap;
 drawTrips(document.getElementById('trips'), mapApi);
-drawGallery(document.getElementById('gallery-sec'), document.getElementById('gallery'));
-photoViewer(document.getElementById('photo-view'), document.getElementById('trips'), document.getElementById('gallery'));
+pinTrips(document.getElementById('pin-track'), document.getElementById('trips-col'), document.getElementById('trips'));
+photoViewer(document.getElementById('photo-view'), document.getElementById('trips'));
 drawSeasons(document.getElementById('season'), document.querySelector('.season-wrap .chart-tip'));
